@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import * as BufferGeometryUtils from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import {SimplexNoise} from "three/examples/jsm/math/SimplexNoise"
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -14,7 +15,8 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   1000
 );
-camera.position.set(20, 20, 20);
+// camera.position.set(20, 20, 20);
+camera.position.set(-17,31,33);
 
 // Create renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -31,6 +33,9 @@ controls.enableDamping = true;
 
 let envmap;
 
+// Create noise generator
+const simplex = new SimplexNoise();
+
 (async function () {
   // Load reflection material
   let pmrem = new THREE.PMREMGenerator(renderer);
@@ -39,11 +44,20 @@ let envmap;
     .loadAsync("assets/envmap.hdr");
   envmap = pmrem.fromEquirectangular(envmapTexture).texture;
 
-  for (var i = 0; i < 10; i++)
+  for (var i = -15; i < 15; i++)
   {
-    for (var j = 0; j < 10; j++)
+    for (var j = -15; j < 15; j++)
     {
-      makeHex(3, tileToPosition(i, j));
+      let position = tileToPosition(i, j);
+
+      // Make a cirlce of hexagon
+      if (position.length() > 16) continue;
+
+      // Create noise to random hexagon height
+      let noise = (simplex.noise(i * 0.1, j * 0.1) + 1) * 0.1;
+      noise = Math.pow(noise, 1.5);
+
+      makeHex(noise * 100, position);
     }
   }
 
