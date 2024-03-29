@@ -23,7 +23,23 @@ const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
+// Enable shadow for lighting
+renderer.useLegacyLights = true;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
+
+// Create light
+const light = new THREE.PointLight(new THREE.Color('#FFCB8E').convertSRGBToLinear(), 80, 200);
+light.position.set(10, 20, 10);
+
+light.intensity = 10;
+light.castShadow = true;
+light.shadow.mapSize.width = 512;
+light.shadow.mapSize.height = 512;
+light.shadow.camera.near = 0.5;
+light.shadow.camera.far = 500;
+scene.add(light);
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -149,11 +165,14 @@ function hexGeometry(height, position) {
 function hexMesh(geo, map) {
   let mat = new THREE.MeshPhysicalMaterial({
     envMap: envmap,
-    envMapIntensity: 1,
+    envMapIntensity: 0.135,
     flatShading: true,
     map,
   });
 
   let mesh = new THREE.Mesh(geo, mat);
+  mesh.castShadow = true;
+  mesh.receiveShadow = true;
+
   return mesh;
 }
