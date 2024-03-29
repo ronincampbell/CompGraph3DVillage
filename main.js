@@ -36,6 +36,8 @@ let envmap;
 // Create noise generator
 const simplex = new SimplexNoise();
 
+
+// Constant variables
 const MAX_INTERATION = 15;
 const MAX_HEIGHT = 10;
 const STONE_HEIGHT = MAX_HEIGHT * 0.8;
@@ -45,6 +47,7 @@ const SAND_HEIGHT = MAX_HEIGHT * 0.3;
 const DIRT2_HEIGHT = MAX_HEIGHT * 0;
 
 (async function () {
+
   // Load reflection material
   let pmrem = new THREE.PMREMGenerator(renderer);
   let envmapTexture = await new RGBELoader()
@@ -52,6 +55,7 @@ const DIRT2_HEIGHT = MAX_HEIGHT * 0;
     .loadAsync("assets/envmap.hdr");
   envmap = pmrem.fromEquirectangular(envmapTexture).texture;
 
+  // Create texture from path
   let textures = {
     dirt: await new THREE.TextureLoader().loadAsync("assets/dirt.png"),
     dirt2: await new THREE.TextureLoader().loadAsync("assets/dirt2.jpg"),
@@ -63,6 +67,7 @@ const DIRT2_HEIGHT = MAX_HEIGHT * 0;
 
   createGrid();
 
+  // Create mesh for each material (these geo are added below)
   let stoneMesh = hexMesh(stoneGeo, textures.stone);
   let grassMesh = hexMesh(grassGeo, textures.grass);
   let dirt2Mesh = hexMesh(dirt2Geo, textures.dirt2);
@@ -94,6 +99,8 @@ function createGrid() {
   }
 }
 
+
+
 // Fix a hexagon into the grid
 function tileToPosition(tileX, tileY) {
   return new THREE.Vector2((tileX + (tileY % 2) * 0.5) * 1.77, tileY * 1.535);
@@ -106,13 +113,7 @@ let dirt2Geo = new THREE.BoxGeometry(0, 0, 0);
 let sandGeo = new THREE.BoxGeometry(0, 0, 0);
 let grassGeo = new THREE.BoxGeometry(0, 0, 0);
 
-function hexGeometry(height, position) {
-  let geo = new THREE.CylinderGeometry(1, 1, height, 6, 1, false);
-  geo.translate(position.x, height * 0.5, position.y);
-
-  return geo;
-}
-
+// In make hex, a new geometry will be created and merge in following geo
 function makeHex(height, position) {
   let geo = hexGeometry(height, position);
 
@@ -136,6 +137,13 @@ function makeHex(height, position) {
   {
     dirt2Geo = BufferGeometryUtils.mergeGeometries([geo, dirt2Geo]);
   }
+}
+
+function hexGeometry(height, position) {
+  let geo = new THREE.CylinderGeometry(1, 1, height, 6, 1, false);
+  geo.translate(position.x, height * 0.5, position.y);
+
+  return geo;
 }
 
 function hexMesh(geo, map) {
