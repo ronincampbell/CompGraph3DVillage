@@ -37,10 +37,22 @@ document.body.appendChild(renderer.domElement);
 const light = globalLight();
 scene.add(light);
 
+const dayCycle = {
+  time: 0,
+}
+
 // Create Gui
 const gui = new GUI();
 const lightFolder = gui.addFolder('Light')
 lightFolder.add(light, 'intensity', 0, 10);
+lightFolder.add(light.color, 'r', 0, 1);
+lightFolder.add(light.color, 'g', 0, 1);
+lightFolder.add(light.color, 'b', 0, 1);
+lightFolder.add(light.position, 'x', -40, 40).name('sun position');
+
+const dayCycleFolder = gui.addFolder('Day')
+dayCycleFolder.add(dayCycle, 'time', 0, 1);
+
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -62,6 +74,8 @@ controls.enableDamping = true;
 
   renderer.setAnimationLoop(() => {
     controls.update();
+    
+    light.color.lerpColors(new THREE.Color('Red'), new THREE.Color('Yellow'), dayCycle.time);
     renderer.render(scene, camera);
   });
 })();
