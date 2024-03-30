@@ -5,6 +5,8 @@ import { SimplexNoise } from "three/examples/jsm/math/SimplexNoise";
 import { TextureLoader } from "./components/textureLoader";
 import { meshGenerator } from "./components/meshGenerator";
 import { envMapLoader } from "./components/envMapLoader";
+import { globalLight } from "./components/globalLight";
+import { GUI } from 'dat.gui'
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -32,16 +34,13 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 // Create light
-const light = new THREE.PointLight(new THREE.Color('#FFCB8E').convertSRGBToLinear(), 80, 200);
-light.position.set(10, 20, 10);
-
-light.intensity = 5;
-light.castShadow = true;
-light.shadow.mapSize.width = 512;
-light.shadow.mapSize.height = 512;
-light.shadow.camera.near = 0.5;
-light.shadow.camera.far = 500;
+const light = globalLight();
 scene.add(light);
+
+// Create Gui
+const gui = new GUI();
+const lightFolder = gui.addFolder('Light')
+lightFolder.add(light, 'intensity', 0, 10);
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
