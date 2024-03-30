@@ -3,6 +3,7 @@
     "three": "^0.163.0"
   },
   "devDependencies": {
+    "@types/dat.gui": "^0.7.12",
     "vite": "^5.2.7"
   }
 }
