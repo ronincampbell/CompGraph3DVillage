@@ -38,6 +38,7 @@ const light = globalLight();
 scene.add(light);
 
 const dayCycle = {
+  enable: false,
   time: 0,
 }
 
@@ -51,6 +52,7 @@ lightFolder.add(light.color, 'b', 0, 1);
 lightFolder.add(light.position, 'x', -40, 40).name('sun position');
 
 const dayCycleFolder = gui.addFolder('Day')
+dayCycleFolder.add(dayCycle, 'enable', false, true)
 dayCycleFolder.add(dayCycle, 'time', 0, 1);
 
 
@@ -74,8 +76,12 @@ controls.enableDamping = true;
 
   renderer.setAnimationLoop(() => {
     controls.update();
+
+    if (dayCycle.enable)
+    {
+      light.color.lerpColors(new THREE.Color('Red'), new THREE.Color('Yellow'), dayCycle.time);
+    }
     
-    light.color.lerpColors(new THREE.Color('Red'), new THREE.Color('Yellow'), dayCycle.time);
     renderer.render(scene, camera);
   });
 })();
