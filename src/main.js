@@ -92,3 +92,39 @@ controls.enableDamping = true;
 })();
 
 
+// MOUSE CONTROL
+
+var raycaster = new THREE.Raycaster();
+var selectedObj = null;
+
+function onDocumentMouseDown(event)
+{
+  var mouse = new THREE.Vector2();
+  mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
+  mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
+
+  raycaster.setFromCamera(mouse, camera);
+  var intersects = raycaster.intersectObjects(scene.children, true);
+  if (intersects.length > 0)
+  {
+    if (intersects[0].object.name == "house" && !selectedObj)
+    {
+      selectedObj = intersects[0].object;
+      selectedObj.traverse(function (child) {
+        if (child.isMesh) {
+            
+            if (child.material) {
+                var material = new THREE.MeshBasicMaterial();
+                material.color = new THREE.Color(1, 0.5, 0.5);
+
+                child.material = material;
+            }
+          }
+        }
+      )
+    }
+  }
+}
+
+document.addEventListener("mousedown", onDocumentMouseDown, false);
+

@@ -8,7 +8,8 @@ export async function FbxLoader(name, path, texPath, scene)
     loader.load(path, function(object) {
         object.traverse(function (child) {
             if ((child as THREE.Mesh).isMesh) {
-
+                child.name = name;
+                
                 if ((child as THREE.Mesh).material) {
                     var material = new THREE.MeshBasicMaterial();
                     material.color = new THREE.Color(0.9, 0.9, 0.9);
