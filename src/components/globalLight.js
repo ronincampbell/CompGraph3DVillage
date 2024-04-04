@@ -1,6 +1,6 @@
 import * as THREE from "three"
 
-export function globalLight()
+export function GlobalLight()
 {
     const light = new THREE.PointLight(new THREE.Color('#FFCB8E').convertSRGBToLinear(), 80, 200);
     light.position.set(10, 20, 10);

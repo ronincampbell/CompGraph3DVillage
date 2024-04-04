@@ -20,7 +20,7 @@ let dirt2Geo = new THREE.BoxGeometry(0, 0, 0);
 let sandGeo = new THREE.BoxGeometry(0, 0, 0);
 let grassGeo = new THREE.BoxGeometry(0, 0, 0);
 
-export function meshGenerator(textures, envmap) {
+export function MeshGenerator(textures, envmap) {
   for (var i = -MAX_INTERATION; i < MAX_INTERATION; i++) {
     for (var j = -MAX_INTERATION; j < MAX_INTERATION; j++) {
       let position = tileToPosition(i, j);

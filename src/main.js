@@ -2,11 +2,12 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
 import { SimplexNoise } from "three/examples/jsm/math/SimplexNoise";
-import { TextureLoader } from "./components/textureLoader";
-import { meshGenerator } from "./components/meshGenerator";
-import { envMapLoader } from "./components/envMapLoader";
-import { globalLight } from "./components/globalLight";
+import { MapTextureLoader } from "./components/mapTextureLoader";
+import { MeshGenerator } from "./components/meshGenerator";
+import { EnvMapLoader } from "./components/envMapLoader";
+import { GlobalLight } from "./components/globalLight";
 import { GUI } from 'dat.gui'
+import { FbxLoader } from "./components/fbxLoader";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -17,7 +18,7 @@ const camera = new THREE.PerspectiveCamera(
   45,
   window.innerWidth / window.innerHeight,
   0.1,
-  1000
+  10000
 );
 // camera.position.set(20, 20, 20);
 camera.position.set(-17, 31, 33);
@@ -34,13 +35,14 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
 
 // Create light
-const light = globalLight();
+const light = GlobalLight();
 scene.add(light);
 
 const dayCycle = {
   enable: false,
   time: 0,
 }
+
 
 // Create Gui
 const gui = new GUI();
@@ -64,14 +66,17 @@ controls.enableDamping = true;
 
 (async function () {
 
-  let envmap = envMapLoader(renderer);
+  let envmap = EnvMapLoader(renderer);
 
-  // Create texture from path
-  let textures = await TextureLoader();
+  // Adding house model
+  await FbxLoader("house", "../assets/house.fbx", "../assets/houseTex.png", scene);
 
-  // Create mesh for each material (these geo are added below)
-  let mesh = meshGenerator(textures, envmap);
-  scene.add(mesh.stoneMesh, mesh.dirtMesh, mesh.dirt2Mesh, mesh.sandMesh, mesh.grassMesh);
+  // // Create texture from path
+  // let textures = await MapTextureLoader();
+
+  // // Create mesh for each material (these geo are added below)
+  // let mesh = MeshGenerator(textures, envmap);
+  // scene.add(mesh.stoneMesh, mesh.dirtMesh, mesh.dirt2Mesh, mesh.sandMesh, mesh.grassMesh);
 
 
   renderer.setAnimationLoop(() => {
