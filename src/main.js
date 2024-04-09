@@ -6,9 +6,8 @@ import { GUI } from 'dat.gui'
 import { FbxLoader } from "./components/fbxLoader";
 import { MouseControl, MouseSelectedObj } from "./components/mouseControl";
 import { ColorSetter } from "./components/colorSetter";
-import { DrawLine } from "./components/drawLine";
-import { PathFinding } from "./components/pathFinding";
-import { Grid } from "./components/grid";
+import { Grid } from "./components/pathfinding/grid";
+import { PathFinding } from "./components/pathfinding/pathFinding";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -123,7 +122,8 @@ controls.enableDamping = true;
       // roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
   }
 
-  let grid = new Grid(10, 10, 10, scene);
+  let pathFinding = new PathFinding(10, 10, scene);
+  // let grid = new Grid(10, 10, 10, scene);
   
 
 

@@ -1,15 +1,19 @@
 import * as THREE from 'three';
-import { DrawLineFrom2Point } from "./drawLine";
+import { DrawLineFrom2Point } from "../drawLine";
 
 
-export class Grid {
+export class Grid<T> {
+    width: number; height: number; cellSize: number;
+    gridArr: Array<Array<T>>;
+
+
     constructor(width, height, cellSize, scene)
     {
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
 
-        this.gridArr = Array(width).fill(0).map(x => Array(height).fill(0));
+        this.gridArr = Array(width).fill(null).map(x => Array(height).fill(null));
 
         for (var i = 0; i < width - 1; i++)
         {
@@ -25,5 +29,10 @@ export class Grid {
         }
     }
 
-
+    SetValue(x, y, value) {
+        if (x >= 0 && y >=0 && x < this.width && y < this.height)
+        {
+            this.gridArr[x][y] = value;
+        }
+    }
 }
