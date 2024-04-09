@@ -1,27 +1,44 @@
 import * as THREE from 'three';
 import { DrawLineFrom2Point } from "../drawLine";
+import { PathNode } from './pathNode';
 
 
-export class Grid<T> {
+export class Grid {
     width: number; height: number; cellSize: number;
-    gridArr: Array<Array<T>>;
+    gridArr: Array<Array<PathNode>>;
+    value: PathNode;
+    noDraw?: boolean;
 
 
-    constructor(width, height, cellSize, scene)
+    constructor(width, height, cellSize)
     {
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
 
-        this.gridArr = Array(width).fill(null).map(x => Array(height).fill(null));
+        this.value = new PathNode(this, 0, 0);
 
-        for (var i = 0; i < width - 1; i++)
+        this.gridArr = Array(width).fill(this.value).map(x => Array(height).fill(this.value));
+
+        for (var i = 0; i < width; i++)
         {
-            for (var j = 0; j < height - 1; j++)
+            for (var j = 0; j < height; j++)
             {
-                let point0 = new THREE.Vector3(i * cellSize, 0, j * cellSize);
-                let point1 = new THREE.Vector3((i+1) * cellSize, 0, j * cellSize);
-                let point2 = new THREE.Vector3(i * cellSize, 0, (j+1) * cellSize);
+                this.gridArr[i][j] = new PathNode(this, i, j);
+            }
+        }
+
+        
+    }
+
+    Draw(scene) {
+        for (var i = 0; i < this.width - 1; i++)
+        {
+            for (var j = 0; j < this.height - 1; j++)
+            {
+                let point0 = new THREE.Vector3(i * this.cellSize, 0, j * this.cellSize);
+                let point1 = new THREE.Vector3((i+1) * this.cellSize, 0, j * this.cellSize);
+                let point2 = new THREE.Vector3(i * this.cellSize, 0, (j+1) * this.cellSize);
 
                 DrawLineFrom2Point(point0, point1, scene);
                 DrawLineFrom2Point(point0, point2, scene);
@@ -44,7 +61,7 @@ export class Grid<T> {
         return this.height;
     }
 
-    GetGridObject(x, y) : T {
+    GetGridObject(x, y) : PathNode {
         return this.gridArr[x][y];
     }
 }

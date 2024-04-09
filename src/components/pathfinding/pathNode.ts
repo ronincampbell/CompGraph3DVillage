@@ -1,8 +1,9 @@
 import { Grid } from "./grid";
+import * as THREE from 'three';
 
 export class PathNode {
 
-    grid: Grid<PathNode>; 
+    grid: Grid; 
     x: number; y: number; gCost:number; hCost: number; fCost: number; 
     cameFrom?: PathNode
 
@@ -14,6 +15,10 @@ export class PathNode {
         this.gCost = 0;
         this.hCost = 0;
         this.fCost = 0;
+    }
+
+    GetVector3() : THREE.Vector3 {
+        return new THREE.Vector3(this.x * 10, 0, this.y * 10);
     }
 
     SetNodeCameFrom(node : PathNode)

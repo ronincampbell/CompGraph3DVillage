@@ -8,6 +8,8 @@ import { MouseControl, MouseSelectedObj } from "./components/mouseControl";
 import { ColorSetter } from "./components/colorSetter";
 import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
+import { DrawLine, DrawLineFromPathNode } from "./components/drawLine";
+import { PathNode } from "./components/pathfinding/pathNode";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -83,8 +85,8 @@ controls.enableDamping = true;
 
   let envmap = EnvMapLoader(renderer);
   
-  let posiblePositionsX = [0,20,40,60,80];
-  let posiblePositionsZ = [0,20,40,60,80];
+  let posiblePositionsX = [20,40,60,80];
+  let posiblePositionsZ = [20,40,60,80];
   let gridLength = posiblePositionsX.length * 2 + 1;
   let grids = Array(gridLength).fill(false).map(x => Array(gridLength).fill(false));
 
@@ -117,14 +119,22 @@ controls.enableDamping = true;
   
       await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
 
-      // roadGridIndex.push({x: (x + roadOffset + 50) / 10, z: (z + 50) / 10});
-      // grids[(x + roadOffset + 50) / 10][(z + 50) / 10] = true;
-      // roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
+      roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
+  }
+  console.log(roadCheckPoints);
+  DrawLine(roadCheckPoints, scene);
+
+  
+  for (var i = 0; i < 3; i++)
+  {
+    let pathNodes = [];
+    let pathFinding = new PathFinding(10, 10, scene);
+    if (i == 0) pathFinding.Draw(scene);
+    
+    pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i+1].x / 10, roadCheckPoints[i+1].z / 10);
+    DrawLineFromPathNode(pathNodes, scene);
   }
 
-  let pathFinding = new PathFinding(10, 10, scene);
-  // let grid = new Grid(10, 10, 10, scene);
-  
 
 
   renderer.setAnimationLoop(() => {
