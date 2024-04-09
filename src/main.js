@@ -10,6 +10,7 @@ import { GUI } from 'dat.gui'
 import { FbxLoader } from "./components/fbxLoader";
 import { MouseControl, MouseSelectedObj } from "./components/mouseControl";
 import { ColorSetter } from "./components/colorSetter";
+import { randInt } from "three/src/math/MathUtils";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -87,8 +88,31 @@ var selectedObj = null;
 
   let envmap = EnvMapLoader(renderer);
 
+  let posiblePositionsX = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
+  let posiblePositionsZ = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
+  
   // Adding house model
-  // var houseObj = await FbxLoader("house", "../assets/house.fbx", "../assets/houseTex.png", scene);
+  for (let i = 0; i < 10; i++) {
+      if (posiblePositionsX.length === 0 || posiblePositionsZ.length === 0) {
+          console.log("No more unique positions available.");
+          break;
+      }
+    
+      // pick random index for possible positions x
+      let indexX = Math.floor(Math.random() * posiblePositionsX.length);
+      // select the position and then remove it from the array
+      let x = posiblePositionsX[indexX];
+      posiblePositionsX.splice(indexX, 1);
+  
+      // pick random index for possible positions z
+      let indexZ = Math.floor(Math.random() * posiblePositionsZ.length);
+      // select the position and then remove it from the array
+      let z = posiblePositionsZ[indexZ];
+      posiblePositionsZ.splice(indexZ, 1);
+  
+      await FbxLoader("house", "../assets/house.fbx", "../assets/houseTex.png", scene, x, 0, z);
+  }
+  
 
   // // Create texture from path
   // let textures = await MapTextureLoader();

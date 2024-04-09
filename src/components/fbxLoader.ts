@@ -2,12 +2,7 @@ import * as THREE from 'three'
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader"
 import { TextureLoader } from './textureLoader'
 
-type FbxType = {
-    name: string,
-    path: string,
-}
-
-export function FbxLoader(name, path, texPath, scene)
+export async function FbxLoader(name, path, texPath, scene, positionx, positiony, positionz)
 {
     const loader = new FBXLoader()
     loader.load(path, function(object) {
@@ -31,5 +26,6 @@ export function FbxLoader(name, path, texPath, scene)
         })
         object.scale.set(.01, .01, .01)
         scene.add(object);
+        object.position.set(positionx, positiony, positionz);
     })
 }
