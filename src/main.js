@@ -88,8 +88,14 @@ var selectedObj = null;
 
   let envmap = EnvMapLoader(renderer);
 
-  let posiblePositionsX = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
-  let posiblePositionsZ = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
+  // let posiblePositionsX = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
+  // let posiblePositionsZ = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
+
+  let posiblePositionsX = [-5];
+  let posiblePositionsZ = [0];
+
+  let roadCheckPoints = [];
+  let roadOffset = -5;
   
   // Adding house model
   for (let i = 0; i < 10; i++) {
@@ -110,7 +116,8 @@ var selectedObj = null;
       let z = posiblePositionsZ[indexZ];
       posiblePositionsZ.splice(indexZ, 1);
   
-      await FbxLoader("house", "../assets/house.fbx", "../assets/houseTex.png", scene, x, 0, z);
+      await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
+      roadCheckPoints.add(new THREE.Vector3(x + roadOffset, 0, z));
   }
   
 
