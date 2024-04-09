@@ -8,6 +8,8 @@ import { EnvMapLoader } from "./components/envMapLoader";
 import { GlobalLight } from "./components/globalLight";
 import { GUI } from 'dat.gui'
 import { FbxLoader } from "./components/fbxLoader";
+import { MouseControl, MouseSelectedObj } from "./components/mouseControl";
+import { ColorSetter } from "./components/colorSetter";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -58,18 +60,35 @@ dayCycleFolder.add(dayCycle, 'enable', false, true)
 dayCycleFolder.add(dayCycle, 'time', 0, 1);
 
 
+const HouseControl = {
+  type: 0,
+  color: new THREE.Color(1, 1, 1)
+};
+// Change house type when this one changes
+var houseLastType = 0;
+
+const houseFolder = gui.addFolder('House')
+houseFolder.add(HouseControl, 'type', 0, 3);
+houseFolder.add(HouseControl.color, 'r', 0, 1);
+houseFolder.add(HouseControl.color, 'g', 0, 1);
+houseFolder.add(HouseControl.color, 'b', 0, 1);
+
+
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
 controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
+
+var selectedObj = null;
+
 (async function () {
 
   let envmap = EnvMapLoader(renderer);
 
   // Adding house model
-  await FbxLoader("house", "../assets/house.fbx", "../assets/houseTex.png", scene);
+  // var houseObj = await FbxLoader("house", "../assets/house.fbx", "../assets/houseTex.png", scene);
 
   // // Create texture from path
   // let textures = await MapTextureLoader();
@@ -86,45 +105,39 @@ controls.enableDamping = true;
     {
       light.color.lerpColors(new THREE.Color('Red'), new THREE.Color('Yellow'), dayCycle.time);
     }
-    
+
+    if (houseLastType != Math.round(HouseControl.type))
+    {
+      if (MouseSelectedObj != null)
+      {
+        scene.remove(MouseSelectedObj.name);
+      }
+
+      houseLastType = Math.round(HouseControl.type);
+
+      switch (houseLastType)
+      {
+        case 1:
+          FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene);
+          break;
+        case 2:
+          var objPath = "../assets/house2/house.fbx";
+          var texPath = "../assets/house2/albedo.png"
+          FbxLoader("house", objPath, texPath, scene);
+          break;
+      }
+    }
+
+    if (MouseSelectedObj != null)
+    {
+      ColorSetter(MouseSelectedObj, HouseControl.color);
+    }
+
     renderer.render(scene, camera);
   });
 })();
 
-
 // MOUSE CONTROL
 
-var raycaster = new THREE.Raycaster();
-var selectedObj = null;
-
-function onDocumentMouseDown(event)
-{
-  var mouse = new THREE.Vector2();
-  mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
-  mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
-
-  raycaster.setFromCamera(mouse, camera);
-  var intersects = raycaster.intersectObjects(scene.children, true);
-  if (intersects.length > 0)
-  {
-    if (intersects[0].object.name == "house" && !selectedObj)
-    {
-      selectedObj = intersects[0].object;
-      selectedObj.traverse(function (child) {
-        if (child.isMesh) {
-            
-            if (child.material) {
-                var material = new THREE.MeshBasicMaterial();
-                material.color = new THREE.Color(1, 0.5, 0.5);
-
-                child.material = material;
-            }
-          }
-        }
-      )
-    }
-  }
-}
-
-document.addEventListener("mousedown", onDocumentMouseDown, false);
+var mouseControl = MouseControl(document, renderer, camera, scene);
 
