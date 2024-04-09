@@ -29,10 +29,22 @@ export class Grid<T> {
         }
     }
 
-    SetValue(x, y, value) {
+    SetValue(x, y, value) : void {
         if (x >= 0 && y >=0 && x < this.width && y < this.height)
         {
             this.gridArr[x][y] = value;
         }
+    }
+
+    GetWidth(): number {
+        return this.width;
+    }
+
+    GetHeight(): number {
+        return this.height;
+    }
+
+    GetGridObject(x, y) : T {
+        return this.gridArr[x][y];
     }
 }

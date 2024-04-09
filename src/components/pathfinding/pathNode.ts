@@ -4,7 +4,7 @@ export class PathNode {
 
     grid: Grid<PathNode>; 
     x: number; y: number; gCost:number; hCost: number; fCost: number; 
-    cameFrom: PathNode
+    cameFrom?: PathNode
 
     constructor(newGrid, newX, newY)
     {
@@ -14,5 +14,14 @@ export class PathNode {
         this.gCost = 0;
         this.hCost = 0;
         this.fCost = 0;
+    }
+
+    SetNodeCameFrom(node : PathNode)
+    {
+        this.cameFrom = node;
+    }
+
+    CalculateFCost() {
+        this.fCost = this.hCost + this.gCost;
     }
 }
