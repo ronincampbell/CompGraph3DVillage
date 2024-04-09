@@ -1,16 +1,14 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
-import { SimplexNoise } from "three/examples/jsm/math/SimplexNoise";
-import { MapTextureLoader } from "./components/mapTextureLoader";
-import { MeshGenerator } from "./components/meshGenerator";
 import { EnvMapLoader } from "./components/envMapLoader";
 import { GlobalLight } from "./components/globalLight";
 import { GUI } from 'dat.gui'
 import { FbxLoader } from "./components/fbxLoader";
 import { MouseControl, MouseSelectedObj } from "./components/mouseControl";
 import { ColorSetter } from "./components/colorSetter";
-import { randInt } from "three/src/math/MathUtils";
+import { DrawLine } from "./components/drawLine";
+import { PathFinding } from "./components/pathFinding";
+import { Grid } from "./components/grid";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -82,21 +80,23 @@ controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
 
-var selectedObj = null;
-
 (async function () {
 
   let envmap = EnvMapLoader(renderer);
+  
+  let posiblePositionsX = [0,20,40,60,80];
+  let posiblePositionsZ = [0,20,40,60,80];
+  let gridLength = posiblePositionsX.length * 2 + 1;
+  let grids = Array(gridLength).fill(false).map(x => Array(gridLength).fill(false));
 
-  // let posiblePositionsX = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
-  // let posiblePositionsZ = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
+  let roadGridIndex = [];
 
-  let posiblePositionsX = [-5];
-  let posiblePositionsZ = [0];
+  // let posiblePositionsX = [-5];
+  // let posiblePositionsZ = [0];
 
   let roadCheckPoints = [];
-  let roadOffset = -5;
-  
+  let roadOffset = -10;
+
   // Adding house model
   for (let i = 0; i < 10; i++) {
       if (posiblePositionsX.length === 0 || posiblePositionsZ.length === 0) {
@@ -117,16 +117,14 @@ var selectedObj = null;
       posiblePositionsZ.splice(indexZ, 1);
   
       await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
-      roadCheckPoints.add(new THREE.Vector3(x + roadOffset, 0, z));
+
+      // roadGridIndex.push({x: (x + roadOffset + 50) / 10, z: (z + 50) / 10});
+      // grids[(x + roadOffset + 50) / 10][(z + 50) / 10] = true;
+      // roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
   }
+
+  let grid = new Grid(10, 10, 10, scene);
   
-
-  // // Create texture from path
-  // let textures = await MapTextureLoader();
-
-  // // Create mesh for each material (these geo are added below)
-  // let mesh = MeshGenerator(textures, envmap);
-  // scene.add(mesh.stoneMesh, mesh.dirtMesh, mesh.dirt2Mesh, mesh.sandMesh, mesh.grassMesh);
 
 
   renderer.setAnimationLoop(() => {
