@@ -9,7 +9,7 @@ import { ColorSetter } from "./components/colorSetter";
 import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
 import { DrawLine, DrawLineFromPathNode } from "./components/drawLine";
-import { PathNode } from "./components/pathfinding/pathNode";
+import { PathSpawner } from "./components/path/pathSpawner";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -119,6 +119,7 @@ controls.enableDamping = true;
   }
   DrawLine(roadCheckPoints, scene);
 
+  let pathSpawner = new PathSpawner(10, 10, 10);
   
   for (var i = 0; i < 3; i++)
   {
@@ -127,8 +128,14 @@ controls.enableDamping = true;
     if (i == 0) pathFinding.Draw(scene);
     
     pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i+1].x / 10, roadCheckPoints[i+1].z / 10);
+    
+    // Set spawner to spawn grid
+    pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
     DrawLineFromPathNode(pathNodes, scene);
   }
+
+  // console.log(pathSpawner);
+  await pathSpawner.SpawnPath(scene);
 
 
 

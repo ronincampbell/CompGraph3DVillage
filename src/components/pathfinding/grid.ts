@@ -6,7 +6,6 @@ import { PathNode } from './pathNode';
 export class Grid {
     width: number; height: number; cellSize: number;
     gridArr: Array<Array<PathNode>>;
-    value: PathNode;
     noDraw?: boolean;
 
 
@@ -16,9 +15,9 @@ export class Grid {
         this.height = height;
         this.cellSize = cellSize;
 
-        this.value = new PathNode(this, 0, 0);
+        let pathNode = new PathNode(this, 0, 0);
 
-        this.gridArr = Array(width).fill(this.value).map(x => Array(height).fill(this.value));
+        this.gridArr = Array(width).fill(pathNode).map(x => Array(height).fill(pathNode));
 
         for (var i = 0; i < width; i++)
         {

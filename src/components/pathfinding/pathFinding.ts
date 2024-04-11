@@ -117,7 +117,6 @@ export class PathFinding {
         let currentNode : PathNode = endNode;
         while (currentNode.cameFrom != null)
         {
-            console.log(currentNode.cameFrom);
             path.push(currentNode.cameFrom);
             currentNode = currentNode.cameFrom;
         } 

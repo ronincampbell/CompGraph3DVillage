@@ -13,7 +13,6 @@ export function DrawLine(points, scene, color) {
 export function DrawLineFromPathNode(pathNodes : Array<PathNode>, scene) 
 {
     const points = pathNodes.map(item => item.GetVector3());
-    console.log(123);
     DrawLine(points, scene, 0xff0000);
 }
 
