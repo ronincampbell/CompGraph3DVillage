@@ -27,8 +27,20 @@ export class Grid {
                 this.gridArr[i][j] = new PathNode(this, i, j);
             }
         }
+    }
 
-        
+    Clone() : Grid {
+        let newGrid = new Grid(this.width, this.height, this.cellSize);
+
+        for (var i = 0; i < this.width; i++)
+        {
+            for (var j = 0; j < this.height; j++)
+            {
+                newGrid.gridArr[i][j].canPlace = this.gridArr[i][j].canPlace;
+            }
+        }
+
+        return newGrid;
     }
 
     Draw(scene) {
@@ -46,12 +58,12 @@ export class Grid {
         }
     }
 
-    SetValue(x, y, value) : void {
-        if (x >= 0 && y >=0 && x < this.width && y < this.height)
+    SetUnplaceablePathNode(x, y : number) : void {
+        if (x >= 0 && y >= 0 && x <= this.width && y <= this.height)
         {
-            this.gridArr[x][y] = value;
+            this.gridArr[x][y].DisablePlacing();
         }
-    }
+    }   
 
     GetWidth(): number {
         return this.width;

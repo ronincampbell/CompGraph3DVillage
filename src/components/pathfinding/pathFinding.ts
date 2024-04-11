@@ -8,11 +8,11 @@ export class PathFinding {
     closedList: Array<PathNode>;
 
     MOVE_STRAIGHT_COST = 10;
-    MOVE_DIAGONAL_COST = 30;
+    MOVE_DIAGONAL_COST = Number.MAX_VALUE;
     
-    constructor(width, height)
+    constructor(grid)
     {
-        this.grid = new Grid(width, height, 10);
+        this.grid = grid.Clone();
     }
 
     Draw(scene) {
@@ -54,6 +54,7 @@ export class PathFinding {
             this.closedList.push(currentNode);
 
             this.GetNeighborList(currentNode).forEach(neighborNode => {
+                if (!neighborNode.CanBePlaced()) return;
                 if (this.closedList.indexOf(neighborNode) != -1) return;
 
                 let tentativeGCost : number = currentNode.gCost + this.CalculateDistanceCost(currentNode, neighborNode);
@@ -136,6 +137,8 @@ export class PathFinding {
         let lowestFCostNode : PathNode = pathNodeList[0];
         for (var i = 0; i < pathNodeList.length; i++)
         {
+            if (!pathNodeList[i].CanBePlaced()) continue;
+
             if (pathNodeList[i].fCost < lowestFCostNode.fCost)
             {
                 lowestFCostNode = pathNodeList[i];

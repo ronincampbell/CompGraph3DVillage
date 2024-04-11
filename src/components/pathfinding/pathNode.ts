@@ -5,7 +5,8 @@ export class PathNode {
 
     grid: Grid; 
     x: number; y: number; gCost:number; hCost: number; fCost: number; 
-    cameFrom?: PathNode
+    cameFrom?: PathNode;
+    canPlace: boolean
 
     constructor(newGrid, newX, newY)
     {
@@ -15,6 +16,19 @@ export class PathNode {
         this.gCost = 0;
         this.hCost = 0;
         this.fCost = 0;
+        this.canPlace = true;
+    }
+
+    DisablePlacing() : void {
+        this.canPlace = false;
+    }
+
+    EnablePlacing() : void {
+        this.canPlace = true;
+    }
+
+    CanBePlaced() : boolean {
+        return this.canPlace;
     }
 
     GetVector3() : THREE.Vector3 {

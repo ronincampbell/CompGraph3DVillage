@@ -87,13 +87,7 @@ controls.enableDamping = true;
   
   let posiblePositionsX = [20,40,60,80];
   let posiblePositionsZ = [20,40,60,80];
-  let gridLength = posiblePositionsX.length * 2 + 1;
-  let grids = Array(gridLength).fill(false).map(x => Array(gridLength).fill(false));
-
-  let roadGridIndex = [];
-
-  // let posiblePositionsX = [-5];
-  // let posiblePositionsZ = [0];
+  let grid = new Grid(10, 10, 10);
 
   let roadCheckPoints = [];
   let roadOffset = -10;
@@ -120,15 +114,16 @@ controls.enableDamping = true;
       await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
 
       roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
+
+      grid.gridArr[x / 10][z / 10].DisablePlacing();
   }
-  console.log(roadCheckPoints);
   DrawLine(roadCheckPoints, scene);
 
   
   for (var i = 0; i < 3; i++)
   {
     let pathNodes = [];
-    let pathFinding = new PathFinding(10, 10, scene);
+    let pathFinding = new PathFinding(grid);
     if (i == 0) pathFinding.Draw(scene);
     
     pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i+1].x / 10, roadCheckPoints[i+1].z / 10);
