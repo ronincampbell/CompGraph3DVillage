@@ -111,7 +111,8 @@ controls.enableDamping = true;
       let z = posiblePositionsZ[indexZ];
       posiblePositionsZ.splice(indexZ, 1);
   
-      await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
+      // await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
+      await FbxLoader("house", "../assets/house/house.fbx", "", scene, x, 0, z, 0.04);
 
       roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
 
