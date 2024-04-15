@@ -40,12 +40,12 @@ export class PathSpawnPoint
     {
         if (this.top || this.bottom || this.left || this.right)
         {
-            await FbxLoader("tile", "../../../assets/path/tile.fbx", "../../../assets/path/stone.png", scene, this.x * cellSize, -5, this.y * cellSize, 5);
-            // await FbxLoader("tile", "../../../assets/path/path.fbx", "../../../assets/path/stone.png", scene, this.x * cellSize + 32, 0, this.y * cellSize, 0.05);
+            // await FbxLoader("tile", "../../../assets/path/tile.fbx", "../../../assets/path/stone.png", scene, this.x * cellSize, -5, this.y * cellSize, 5);
+            await FbxLoader("tile", "../../../assets/path/pathJoin.fbx", "", scene, this.x * cellSize + 32, 0, this.y * cellSize, 0.05);
         }
         else 
         {
-            await FbxLoader("tile", "../../../assets/path/tile.fbx", "../../../assets/path/grass.jpg", scene, this.x * cellSize, -5, this.y * cellSize, 5);
+            // await FbxLoader("tile", "../../../assets/path/tile.fbx", "../../../assets/path/grass.jpg", scene, this.x * cellSize, -5, this.y * cellSize, 5);
         }
     }
 }
