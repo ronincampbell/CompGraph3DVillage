@@ -91,7 +91,7 @@ controls.enableDamping = true;
       let z = posiblePositionsZ[indexZ];
       posiblePositionsZ.splice(indexZ, 1);
   
-      await FbxLoader("house", "../assets/house.fbx", "../assets/houseTex.png", scene, x, 0, z);
+      await FbxLoader("house", "../assets/CustomModels/NewPath.fbx", "../assets/CustomModels/Textures/PathTexture.png", scene, x, 0, z);
   }
   
 
