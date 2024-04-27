@@ -4,15 +4,17 @@ import { PathSpawnPoint } from "./pathSpawnPoint";
 export class PathSpawner 
 {
     cellSize: number; width: number; height: number;
+    building: any;
     pathSpawnPoints: Array<Array<PathSpawnPoint>>;
 
-    constructor(width, height, cellSize)
+    constructor(width, height, cellSize, building)
     {
         this.width = width;
         this.height = height;
         this.cellSize = cellSize;
+        this.building = building;
 
-        let point = new PathSpawnPoint(0, 0);
+        let point = new PathSpawnPoint(0, 0, building);
 
         this.pathSpawnPoints = Array(width).fill(point).map(x => Array(height).fill(point));
 
@@ -20,7 +22,7 @@ export class PathSpawner
         {
             for (var j = 0; j < height; j++)
             {
-                this.pathSpawnPoints[i][j] = new PathSpawnPoint(i, j);
+                this.pathSpawnPoints[i][j] = new PathSpawnPoint(i, j, building);
             }
         }
     }

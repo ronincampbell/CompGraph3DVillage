@@ -80,6 +80,15 @@ controls.target.set(0, 0, 0);
 controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
+// List object
+let building = {
+  house: {name: "house", model: "../assets/house/house.fbx", tex: "", scale: 0.04, light: ""},
+  house1: {name: "house", model: "../assets/house1/house.fbx", tex: "../assets/house1/tex.png", scale: 0.001, light: ""},
+  house1: {name: "house", model: "../assets/house2/house.fbx", tex: "../assets/house2/normal.jpg", scale: 0.04, light: ""},
+  path: {name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/stone.png", scale: 0.05, light: ""},
+  grass: {name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/grass.jpg", scale: 0.05, light: ""},
+};
+
 
 (async function () {
 
@@ -112,7 +121,7 @@ controls.enableDamping = true;
       posiblePositionsZ.splice(indexZ, 1);
   
       // await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
-      await FbxLoader("house", "../assets/house/house.fbx", "", scene, x, 0, z, 0.04);
+      await FbxLoader(building.house, scene, x, 0, z);
 
       roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
 
@@ -120,7 +129,7 @@ controls.enableDamping = true;
   }
   DrawLine(roadCheckPoints, scene);
 
-  let pathSpawner = new PathSpawner(10, 10, 10);
+  let pathSpawner = new PathSpawner(10, 10, 10, building);
   
   for (var i = 0; i < 3; i++)
   {
@@ -162,12 +171,12 @@ controls.enableDamping = true;
       switch (houseLastType)
       {
         case 1:
-          FbxLoader("house", "../assets/house/house.fbx", "../assets/house/tex.png", scene, position.x, position.y, position.z, 0.04);
+          FbxLoader(building.house, scene, position.x, position.y, position.z);
           break;
         case 2:
           var objPath = "../assets/house2/house.fbx";
           var texPath = "../assets/house2/albedo.png"
-          FbxLoader("house", objPath, texPath, scene, position.x, position.y, position.z, 0.04);
+          FbxLoader(building.house1, scene, position.x, position.y, position.z);
           break;
       }
     }

@@ -7,11 +7,13 @@ export class PathSpawnPoint
     x: number; y : number;
     left: boolean = false; right: boolean = false; 
     top: boolean = false; bottom: boolean = false;
+    building: any;
 
-    constructor(x, y)
+    constructor(x, y, building)
     {
         this.x = x;
         this.y = y;
+        this.building = building;
     }
 
     SetCameFrom(node: PathNode | undefined) : void {
@@ -41,10 +43,11 @@ export class PathSpawnPoint
         if (this.top || this.bottom || this.left || this.right)
         {
             // await FbxLoader("tile", "../../../assets/path/tile.fbx", "../../../assets/path/stone.png", scene, this.x * cellSize, -5, this.y * cellSize, 5);
-            await FbxLoader("tile", "../../../assets/path/pathJoin.fbx", "", scene, this.x * cellSize + 32, 0, this.y * cellSize, 0.05);
+            await FbxLoader(this.building.path, scene, this.x * cellSize + 32, 0, this.y * cellSize);
         }
         else 
         {
+            await FbxLoader(this.building.grass, scene, this.x * cellSize + 32, 0, this.y * cellSize);
             // await FbxLoader("tile", "../../../assets/path/tile.fbx", "../../../assets/path/grass.jpg", scene, this.x * cellSize, -5, this.y * cellSize, 5);
         }
     }
