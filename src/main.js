@@ -62,7 +62,7 @@ dayCycleFolder.add(dayCycle, 'time', 0, 1);
 
 const HouseControl = {
   type: 0,
-  color: new THREE.Color(1, 1, 1)
+  color: new THREE.Color(1, 0, 0)
 };
 // Change house type when this one changes
 var houseLastType = 0;
@@ -172,8 +172,12 @@ controls.enableDamping = true;
 
     if (MouseSelectedObj != null)
     {
-      ColorSetter(MouseSelectedObj, HouseControl.color);
+      MouseSelectedObj.material.color = HouseControl.color.clone();
+      // console.log(MouseSelectedObj)
+      // ColorSetter(MouseSelectedObj, HouseControl.color);
     }
+
+    
 
     renderer.render(scene, camera);
   });
