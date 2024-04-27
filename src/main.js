@@ -83,8 +83,8 @@ controls.enableDamping = true;
 // List object
 let building = {
   house: {name: "house", model: "../assets/house/house.fbx", tex: "", scale: 0.04, light: ""},
-  house1: {name: "house", model: "../assets/house1/house.fbx", tex: "../assets/house1/tex.png", scale: 0.001, light: ""},
-  house1: {name: "house", model: "../assets/house2/house.fbx", tex: "../assets/house2/normal.jpg", scale: 0.04, light: ""},
+  house1: {name: "house", model: "../assets/house1/house.fbx", tex: "../assets/house1/tex.png", scale: 0.01, light: ""},
+  house2: {name: "house", model: "../assets/house2/house.fbx", tex: "../assets/house2/normal.png", scale: 0.015, light: ""},
   path: {name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/stone.png", scale: 0.05, light: ""},
   grass: {name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/grass.jpg", scale: 0.05, light: ""},
 };
@@ -170,13 +170,14 @@ let building = {
 
       switch (houseLastType)
       {
-        case 1:
+        case 0:
           FbxLoader(building.house, scene, position.x, position.y, position.z);
           break;
-        case 2:
-          var objPath = "../assets/house2/house.fbx";
-          var texPath = "../assets/house2/albedo.png"
+        case 1:
           FbxLoader(building.house1, scene, position.x, position.y, position.z);
+          break;
+        case 2:
+          FbxLoader(building.house2, scene, position.x, position.y, position.z);
           break;
       }
     }

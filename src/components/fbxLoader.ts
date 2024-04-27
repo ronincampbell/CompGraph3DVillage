@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader"
 import { TextureLoader } from './textureLoader'
 
-export async function FbxLoader(building, scene, positionx, positiony, positionz, scale = 0.01)
+export async function FbxLoader(building, scene, positionx, positiony, positionz)
 {
     const loader = new FBXLoader();
     loader.load(building.model, function(object) {
