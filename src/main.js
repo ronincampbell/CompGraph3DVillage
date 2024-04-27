@@ -150,9 +150,11 @@ controls.enableDamping = true;
 
     if (houseLastType != Math.round(HouseControl.type))
     {
+      let position = new THREE.Vector3(0, 0, 0);
       if (MouseSelectedObj != null)
       {
-        scene.remove(MouseSelectedObj.name);
+        position = MouseSelectedObj.parent.position;
+        scene.remove(MouseSelectedObj.parent);
       }
 
       houseLastType = Math.round(HouseControl.type);
@@ -160,24 +162,20 @@ controls.enableDamping = true;
       switch (houseLastType)
       {
         case 1:
-          FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene);
+          FbxLoader("house", "../assets/house/house.fbx", "../assets/house/tex.png", scene, position.x, position.y, position.z, 0.04);
           break;
         case 2:
           var objPath = "../assets/house2/house.fbx";
           var texPath = "../assets/house2/albedo.png"
-          FbxLoader("house", objPath, texPath, scene);
+          FbxLoader("house", objPath, texPath, scene, position.x, position.y, position.z, 0.04);
           break;
       }
     }
 
     if (MouseSelectedObj != null)
     {
-      MouseSelectedObj.material.color = HouseControl.color.clone();
-      // console.log(MouseSelectedObj)
-      // ColorSetter(MouseSelectedObj, HouseControl.color);
+      ColorSetter(MouseSelectedObj, HouseControl.color);
     }
-
-    
 
     renderer.render(scene, camera);
   });

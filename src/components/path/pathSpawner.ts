@@ -45,7 +45,6 @@ export class PathSpawner
 
         this.pathSpawnPoints[pathNode.x][pathNode.y].SetCameFrom(pathNode.cameFrom);
         this.pathSpawnPoints[cameFrom.x][cameFrom.y].SetCameFrom(pathNode);
-        console.log(this.pathSpawnPoints[pathNode.x][pathNode.y]);
     }
 
     async SpawnPath(scene) : Promise<void> 

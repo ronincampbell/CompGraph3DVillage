@@ -1,4 +1,3 @@
-import * as THREE from 'three'
 
 export function ColorSetter(obj, color) {
 
