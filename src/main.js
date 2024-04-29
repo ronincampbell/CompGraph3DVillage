@@ -86,7 +86,7 @@ let building = {
   house1: {name: "house", model: "../assets/house1/house.fbx", tex: "../assets/house1/tex.png", scale: 0.01, light: ""},
   house2: {name: "house", model: "../assets/house2/house.fbx", tex: "../assets/house2/normal.png", scale: 0.015, light: ""},
   path: {name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/stone.png", scale: 0.05, light: ""},
-  grass: {name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/grass.jpg", scale: 0.05, light: ""},
+  grass: {name: "tile", model: "../assets/path/grass.fbx", tex: "../assets/path/grass.png", scale: 0.05, light: ""},
 };
 
 
