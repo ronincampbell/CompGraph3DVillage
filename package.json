@@ -6,5 +6,10 @@
     "@types/dat.gui": "^0.7.12",
     "dat.gui": "^0.7.9",
     "vite": "^5.2.7"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "vite build",
+    "preview": "vite preview"
   }
 }

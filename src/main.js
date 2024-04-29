@@ -1,14 +1,15 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { RGBELoader } from "three/examples/jsm/loaders/RGBELoader";
-import { SimplexNoise } from "three/examples/jsm/math/SimplexNoise";
-import { MapTextureLoader } from "./components/mapTextureLoader";
-import { MeshGenerator } from "./components/meshGenerator";
 import { EnvMapLoader } from "./components/envMapLoader";
 import { GlobalLight } from "./components/globalLight";
 import { GUI } from 'dat.gui'
 import { FbxLoader } from "./components/fbxLoader";
-import { randInt } from "three/src/math/MathUtils";
+import { MouseControl, MouseSelectedObj } from "./components/mouseControl";
+import { ColorSetter } from "./components/colorSetter";
+import { Grid } from "./components/pathfinding/grid";
+import { PathFinding } from "./components/pathfinding/pathFinding";
+import { DrawLine, DrawLineFromPathNode } from "./components/drawLine";
+import { PathSpawner } from "./components/path/pathSpawner";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -59,19 +60,47 @@ dayCycleFolder.add(dayCycle, 'enable', false, true)
 dayCycleFolder.add(dayCycle, 'time', 0, 1);
 
 
+const HouseControl = {
+  type: 0,
+  color: new THREE.Color(1, 0, 0)
+};
+// Change house type when this one changes
+var houseLastType = 0;
+
+const houseFolder = gui.addFolder('House')
+houseFolder.add(HouseControl, 'type', 0, 3);
+houseFolder.add(HouseControl.color, 'r', 0, 1);
+houseFolder.add(HouseControl.color, 'g', 0, 1);
+houseFolder.add(HouseControl.color, 'b', 0, 1);
+
+
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
 controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
+// List object
+let building = {
+  house: {name: "house", model: "../assets/house/house.fbx", tex: "", scale: 0.04, light: ""},
+  house1: {name: "house", model: "../assets/house1/house.fbx", tex: "../assets/house1/tex.png", scale: 0.01, light: ""},
+  house2: {name: "house", model: "../assets/house2/house.fbx", tex: "../assets/house2/normal.png", scale: 0.015, light: ""},
+  path: {name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/stone.png", scale: 0.05, light: ""},
+  grass: {name: "tile", model: "../assets/path/grass.fbx", tex: "../assets/path/grass.png", scale: 0.05, light: ""},
+};
+
+
 (async function () {
 
   let envmap = EnvMapLoader(renderer);
-
-  let posiblePositionsX = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
-  let posiblePositionsZ = [0,5,10,15,20,25,30,35,40,45,50,55,60,65,70,75,80,85,90,95];
   
+  let posiblePositionsX = [20,40,60,80];
+  let posiblePositionsZ = [20,40,60,80];
+  let grid = new Grid(10, 10, 10);
+
+  let roadCheckPoints = [];
+  let roadOffset = -10;
+
   // Adding house model
   for (let i = 0; i < 10; i++) {
       if (posiblePositionsX.length === 0 || posiblePositionsZ.length === 0) {
@@ -91,16 +120,33 @@ controls.enableDamping = true;
       let z = posiblePositionsZ[indexZ];
       posiblePositionsZ.splice(indexZ, 1);
   
-      await FbxLoader("house", "../assets/CustomModels/NewPath.fbx", "../assets/CustomModels/Textures/PathTexture.png", scene, x, 0, z);
+      // await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
+      await FbxLoader(building.house, scene, x, 0, z);
+
+      roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
+
+      grid.gridArr[x / 10][z / 10].DisablePlacing();
   }
+  DrawLine(roadCheckPoints, scene);
+
+  let pathSpawner = new PathSpawner(10, 10, 10, building);
   
+  for (var i = 0; i < 3; i++)
+  {
+    let pathNodes = [];
+    let pathFinding = new PathFinding(grid);
+    if (i == 0) pathFinding.Draw(scene);
+    
+    pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i+1].x / 10, roadCheckPoints[i+1].z / 10);
+    
+    // Set spawner to spawn grid
+    pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
+    DrawLineFromPathNode(pathNodes, scene);
+  }
 
-  // // Create texture from path
-  // let textures = await MapTextureLoader();
+  // console.log(pathSpawner);
+  await pathSpawner.SpawnPath(scene);
 
-  // // Create mesh for each material (these geo are added below)
-  // let mesh = MeshGenerator(textures, envmap);
-  // scene.add(mesh.stoneMesh, mesh.dirtMesh, mesh.dirt2Mesh, mesh.sandMesh, mesh.grassMesh);
 
 
   renderer.setAnimationLoop(() => {
@@ -110,45 +156,42 @@ controls.enableDamping = true;
     {
       light.color.lerpColors(new THREE.Color('Red'), new THREE.Color('Yellow'), dayCycle.time);
     }
-    
+
+    if (houseLastType != Math.round(HouseControl.type))
+    {
+      let position = new THREE.Vector3(0, 0, 0);
+      if (MouseSelectedObj != null)
+      {
+        position = MouseSelectedObj.parent.position;
+        scene.remove(MouseSelectedObj.parent);
+      }
+
+      houseLastType = Math.round(HouseControl.type);
+
+      switch (houseLastType)
+      {
+        case 0:
+          FbxLoader(building.house, scene, position.x, position.y, position.z);
+          break;
+        case 1:
+          FbxLoader(building.house1, scene, position.x, position.y, position.z);
+          break;
+        case 2:
+          FbxLoader(building.house2, scene, position.x, position.y, position.z);
+          break;
+      }
+    }
+
+    if (MouseSelectedObj != null)
+    {
+      ColorSetter(MouseSelectedObj, HouseControl.color);
+    }
+
     renderer.render(scene, camera);
   });
 })();
 
-
 // MOUSE CONTROL
 
-var raycaster = new THREE.Raycaster();
-var selectedObj = null;
-
-function onDocumentMouseDown(event)
-{
-  var mouse = new THREE.Vector2();
-  mouse.x = (event.clientX / renderer.domElement.clientWidth) * 2 - 1;
-  mouse.y = -(event.clientY / renderer.domElement.clientHeight) * 2 + 1;
-
-  raycaster.setFromCamera(mouse, camera);
-  var intersects = raycaster.intersectObjects(scene.children, true);
-  if (intersects.length > 0)
-  {
-    if (intersects[0].object.name == "house" && !selectedObj)
-    {
-      selectedObj = intersects[0].object;
-      selectedObj.traverse(function (child) {
-        if (child.isMesh) {
-            
-            if (child.material) {
-                var material = new THREE.MeshBasicMaterial();
-                material.color = new THREE.Color(1, 0.5, 0.5);
-
-                child.material = material;
-            }
-          }
-        }
-      )
-    }
-  }
-}
-
-document.addEventListener("mousedown", onDocumentMouseDown, false);
+var mouseControl = MouseControl(document, renderer, camera, scene);
 
