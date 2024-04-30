@@ -10,6 +10,7 @@ import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
 import { DrawLine, DrawLineFromPathNode } from "./components/drawLine";
 import { PathSpawner } from "./components/path/pathSpawner";
+import SkyboxLoader from "./components/skyboxLoader";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -80,6 +81,8 @@ controls.target.set(0, 0, 0);
 controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
+SkyboxLoader(scene);
+
 // List object
 let building = {
   house: {name: "house", model: "../assets/house/house.fbx", tex: "", scale: 0.04, light: ""},
@@ -88,7 +91,6 @@ let building = {
   path: {name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/stone.png", scale: 0.05, light: ""},
   grass: {name: "tile", model: "../assets/path/grass.fbx", tex: "../assets/path/grass.png", scale: 0.05, light: ""},
 };
-
 
 (async function () {
 
@@ -120,7 +122,6 @@ let building = {
       let z = posiblePositionsZ[indexZ];
       posiblePositionsZ.splice(indexZ, 1);
   
-      // await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
       await FbxLoader(building.house, scene, x, 0, z);
 
       roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
