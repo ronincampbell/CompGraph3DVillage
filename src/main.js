@@ -183,9 +183,9 @@ let building = {
       }
     }
 
-    if (MouseSelectedObj != null) {
-      ColorSetter(MouseSelectedObj, HouseControl.color);
-    }
+    // if (MouseSelectedObj != null) {
+    //   ColorSetter(MouseSelectedObj, HouseControl.color);
+    // }
 
     renderer.render(scene, camera);
   });
