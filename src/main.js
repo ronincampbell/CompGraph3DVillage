@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { EnvMapLoader } from "./components/envMapLoader";
 import { GlobalLight } from "./components/globalLight";
-import { GUI } from 'dat.gui'
+import { GUI } from "dat.gui";
 import { FbxLoader } from "./components/fbxLoader";
 import { MouseControl, MouseSelectedObj } from "./components/mouseControl";
 import { ColorSetter } from "./components/colorSetter";
@@ -46,38 +46,93 @@ scene.fog = new THREE.Fog(0xffffff, 1, 500);
 const dayCycle = {
   enable: false,
   time: 0,
-}
-
+};
 
 // Create Gui
 const gui = new GUI();
-const lightFolder = gui.addFolder('Light')
-lightFolder.add(light, 'intensity', 0, 10);
-lightFolder.add(light.color, 'r', 0, 1);
-lightFolder.add(light.color, 'g', 0, 1);
-lightFolder.add(light.color, 'b', 0, 1);
-lightFolder.add(light.position, 'x', -40, 40).name('sun position');
+const lightFolder = gui.addFolder("Light");
+lightFolder.add(light, "intensity", 0, 10);
+lightFolder.add(light.color, "r", 0, 1);
+lightFolder.add(light.color, "g", 0, 1);
+lightFolder.add(light.color, "b", 0, 1);
+lightFolder.add(light.position, "x", -40, 40).name("sun position");
 
-const dayCycleFolder = gui.addFolder('Day')
-dayCycleFolder.add(dayCycle, 'enable', false, true)
-dayCycleFolder.add(dayCycle, 'time', 0, 1);
+const dayCycleFolder = gui.addFolder("Day");
+dayCycleFolder.add(dayCycle, "enable", false, true);
+dayCycleFolder.add(dayCycle, "time", 0, 1);
+
+
 
 // Create sky
 addSkyGradient();
 
+// List object
+const building = {
+  house: {
+    name: "house",
+    model: "../assets/house/house.fbx",
+    tex: "",
+    scale: 0.04,
+    light: "",
+    offset: new THREE.Vector3(0,0,0),
+  },
+  house1: {
+    name: "house",
+    model: "../assets/house1/house.fbx",
+    tex: "../assets/house1/tex.png",
+    scale: 0.01,
+    light: "",
+    offset: new THREE.Vector3(0,0,0),
+  },
+  house2: {
+    name: "house",
+    model: "../assets/house2/house.fbx",
+    tex: "../assets/house2/normal.png",
+    scale: 0.015,
+    light: "",
+    offset: new THREE.Vector3(0,0,0),
+  },
+  path: {
+    name: "path",
+    model: "../assets/path/pathJoin.fbx",
+    tex: "../assets/path/stone.png",
+    scale: 0.05,
+    light: "",
+    offset: new THREE.Vector3(32,0,0),
+  },
+  grass: {
+    name: "grass",
+    model: "../assets/path/grass.fbx",
+    tex: "../assets/path/grass.png",
+    scale: 0.05,
+    light: "",
+    offset: new THREE.Vector3(49,0,0),
+  },
+};
+
 const HouseControl = {
   type: 0,
-  color: new THREE.Color(1, 0, 0)
+  color: new THREE.Color(1, 0, 0),
 };
 // Change house type when this one changes
 var houseLastType = 0;
 
-const houseFolder = gui.addFolder('House')
-houseFolder.add(HouseControl, 'type', 0, 3);
-houseFolder.add(HouseControl.color, 'r', 0, 1);
-houseFolder.add(HouseControl.color, 'g', 0, 1);
-houseFolder.add(HouseControl.color, 'b', 0, 1);
+// Spawn House
+var createHouse = { add:async function(){ 
+  if (MouseSelectedObj != null && MouseSelectedObj.name == "grass")
+  {
+    let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
+    scene.remove(MouseSelectedObj.parent)
+    await FbxLoader(building.house, scene, position.x, position.y, position.z);
+  }
+}};
 
+const houseFolder = gui.addFolder("House");
+houseFolder.add(HouseControl, "type", 0, 3);
+houseFolder.add(HouseControl.color, "r", 0, 1);
+houseFolder.add(HouseControl.color, "g", 0, 1);
+houseFolder.add(HouseControl.color, "b", 0, 1);
+houseFolder.add(createHouse, 'add');
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -85,21 +140,10 @@ controls.target.set(0, 0, 0);
 controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
-
 // Skybox
 // SkyboxLoader(scene);
 
-// List object
-let building = {
-  house: { name: "house", model: "../assets/house/house.fbx", tex: "", scale: 0.04, light: "" },
-  house1: { name: "house", model: "../assets/house1/house.fbx", tex: "../assets/house1/tex.png", scale: 0.01, light: "" },
-  house2: { name: "house", model: "../assets/house2/house.fbx", tex: "../assets/house2/normal.png", scale: 0.015, light: "" },
-  path: { name: "tile", model: "../assets/path/pathJoin.fbx", tex: "../assets/path/stone.png", scale: 0.05, light: "" },
-  grass: { name: "tile", model: "../assets/path/grass.fbx", tex: "../assets/path/grass.png", scale: 0.05, light: "" },
-};
-
 (async function () {
-
   let envmap = EnvMapLoader(renderer);
 
   let posiblePositionsX = [20, 40, 60, 80];
@@ -110,57 +154,58 @@ let building = {
   let roadOffset = -10;
 
   // Adding house model
-  for (let i = 0; i < 10; i++) {
-    if (posiblePositionsX.length === 0 || posiblePositionsZ.length === 0) {
-      console.log("No more unique positions available.");
-      break;
-    }
+  // for (let i = 0; i < 10; i++) {
+  //   if (posiblePositionsX.length === 0 || posiblePositionsZ.length === 0) {
+  //     console.log("No more unique positions available.");
+  //     break;
+  //   }
 
-    // pick random index for possible positions x
-    let indexX = Math.floor(Math.random() * posiblePositionsX.length);
-    // select the position and then remove it from the array
-    let x = posiblePositionsX[indexX];
-    posiblePositionsX.splice(indexX, 1);
+  //   // pick random index for possible positions x
+  //   let indexX = Math.floor(Math.random() * posiblePositionsX.length);
+  //   // select the position and then remove it from the array
+  //   let x = posiblePositionsX[indexX];
+  //   posiblePositionsX.splice(indexX, 1);
 
-    // pick random index for possible positions z
-    let indexZ = Math.floor(Math.random() * posiblePositionsZ.length);
-    // select the position and then remove it from the array
-    let z = posiblePositionsZ[indexZ];
-    posiblePositionsZ.splice(indexZ, 1);
+  //   // pick random index for possible positions z
+  //   let indexZ = Math.floor(Math.random() * posiblePositionsZ.length);
+  //   // select the position and then remove it from the array
+  //   let z = posiblePositionsZ[indexZ];
+  //   posiblePositionsZ.splice(indexZ, 1);
 
-    // await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
-    await FbxLoader(building.house, scene, x, 0, z);
+  //   // await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
+  //   await FbxLoader(building.house, scene, x, 0, z);
 
-    roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
+  //   roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
 
-    grid.gridArr[x / 10][z / 10].DisablePlacing();
-  }
-  DrawLine(roadCheckPoints, scene);
+  //   grid.gridArr[x / 10][z / 10].DisablePlacing();
+  // }
+  // DrawLine(roadCheckPoints, scene);
 
   let pathSpawner = new PathSpawner(10, 10, 10, building);
 
-  for (var i = 0; i < 3; i++) {
-    let pathNodes = [];
-    let pathFinding = new PathFinding(grid);
-    if (i == 0) pathFinding.Draw(scene);
+  // for (var i = 0; i < 3; i++) {
+  //   let pathNodes = [];
+  //   let pathFinding = new PathFinding(grid);
+  //   if (i == 0) pathFinding.Draw(scene);
 
-    pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i + 1].x / 10, roadCheckPoints[i + 1].z / 10);
+  //   pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i + 1].x / 10, roadCheckPoints[i + 1].z / 10);
 
-    // Set spawner to spawn grid
-    pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
-    DrawLineFromPathNode(pathNodes, scene);
-  }
+  //   // Set spawner to spawn grid
+  //   pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
+  //   DrawLineFromPathNode(pathNodes, scene);
+  // }
 
-  // console.log(pathSpawner);
   await pathSpawner.SpawnPath(scene);
-
-
 
   renderer.setAnimationLoop(() => {
     controls.update();
 
     if (dayCycle.enable) {
-      light.color.lerpColors(new THREE.Color('Red'), new THREE.Color('Yellow'), dayCycle.time);
+      light.color.lerpColors(
+        new THREE.Color("Red"),
+        new THREE.Color("Yellow"),
+        dayCycle.time
+      );
     }
 
     if (houseLastType != Math.round(HouseControl.type)) {
@@ -185,9 +230,9 @@ let building = {
       }
     }
 
-    // if (MouseSelectedObj != null) {
-    //   ColorSetter(MouseSelectedObj, HouseControl.color);
-    // }
+    if (MouseSelectedObj != null) {
+      ColorSetter(MouseSelectedObj, HouseControl.color);
+    }
 
     renderer.render(scene, camera);
   });
@@ -221,16 +266,15 @@ function addSkyGradient() {
     topColor: { value: new THREE.Color(0x54ebff) }, // sky
     bottomColor: { value: new THREE.Color(0xffffff) }, // ground
     offset: { value: 33 },
-    exponent: { value: 0.6 }
+    exponent: { value: 0.6 },
   };
   var skyGeo = new THREE.SphereGeometry(4000, 32, 15);
   var skyMat = new THREE.ShaderMaterial({
     vertexShader: vertexShader,
     fragmentShader: fragmentShader,
     uniforms: uniforms,
-    side: THREE.BackSide
+    side: THREE.BackSide,
   });
   var sky = new THREE.Mesh(skyGeo, skyMat);
   scene.add(sky);
 }
-

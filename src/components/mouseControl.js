@@ -15,7 +15,7 @@ export function MouseControl(document, renderer, camera, scene) {
         var intersects = raycaster.intersectObjects(scene.children, true);
         if (intersects.length > 0)
         {
-            if (intersects[0].object.name == "house")
+            if (intersects[0].object.name == "grass")
             {
                 MouseSelectedObj = intersects[0].object;
             }
