@@ -42,13 +42,11 @@ export class PathSpawnPoint
     {
         if (this.top || this.bottom || this.left || this.right)
         {
-            // await FbxLoader("tile", "../../../assets/path/tile.fbx", "../../../assets/path/stone.png", scene, this.x * cellSize, -5, this.y * cellSize, 5);
             await FbxLoader(this.building.path, scene, this.x * cellSize + 32, 0, this.y * cellSize);
         }
         else 
         {
-            await FbxLoader(this.building.grass, scene, this.x * cellSize + 32, 0, this.y * cellSize);
-            // await FbxLoader("tile", "../../../assets/path/tile.fbx", "../../../assets/path/grass.jpg", scene, this.x * cellSize, -5, this.y * cellSize, 5);
+            await FbxLoader(this.building.grass, scene, this.x * cellSize + 49, 0, this.y * cellSize);
         }
     }
 }
