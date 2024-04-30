@@ -171,57 +171,8 @@ controls.enableDamping = true;
 // SkyboxLoader(scene);
 
 (async function () {
-  let envmap = EnvMapLoader(renderer);
-
-  let posiblePositionsX = [20, 40, 60, 80];
-  let posiblePositionsZ = [20, 40, 60, 80];
-  
-
-  
-
-  // Adding house model
-  // for (let i = 0; i < 10; i++) {
-  //   if (posiblePositionsX.length === 0 || posiblePositionsZ.length === 0) {
-  //     console.log("No more unique positions available.");
-  //     break;
-  //   }
-
-  //   // pick random index for possible positions x
-  //   let indexX = Math.floor(Math.random() * posiblePositionsX.length);
-  //   // select the position and then remove it from the array
-  //   let x = posiblePositionsX[indexX];
-  //   posiblePositionsX.splice(indexX, 1);
-
-  //   // pick random index for possible positions z
-  //   let indexZ = Math.floor(Math.random() * posiblePositionsZ.length);
-  //   // select the position and then remove it from the array
-  //   let z = posiblePositionsZ[indexZ];
-  //   posiblePositionsZ.splice(indexZ, 1);
-
-  //   // await FbxLoader("house", "../assets/house1/house.fbx", "../assets/house1/tex.png", scene, x, 0, z);
-  //   await FbxLoader(building.house, scene, x, 0, z);
-
-  //   roadCheckPoints.push(new THREE.Vector3(x + roadOffset, 0, z));
-
-  //   grid.gridArr[x / 10][z / 10].DisablePlacing();
-  // }
-  // 
 
   await pathSpawner.SpawnGrass(scene);
-
-  // for (var i = 0; i < 3; i++) {
-  //   let pathNodes = [];
-  //   let pathFinding = new PathFinding(grid);
-  //   if (i == 0) pathFinding.Draw(scene);
-
-  //   pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i + 1].x / 10, roadCheckPoints[i + 1].z / 10);
-
-  //   // Set spawner to spawn grid
-  //   pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
-  //   DrawLineFromPathNode(pathNodes, scene);
-  // }
-
-  
 
   renderer.setAnimationLoop(() => {
     controls.update();
