@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 
 export var MouseSelectedObj = null;
+var lastColor;
 
 export function MouseControl(document, renderer, camera, scene) {
     var raycaster = new THREE.Raycaster();
@@ -17,7 +18,14 @@ export function MouseControl(document, renderer, camera, scene) {
         {
             if (intersects[0].object.name == "grass")
             {
+                if (MouseSelectedObj != null)
+                {
+                    MouseSelectedObj.material.color = lastColor;
+                }
+
                 MouseSelectedObj = intersects[0].object;
+                lastColor = MouseSelectedObj.material.color;
+
             }
         }
     }

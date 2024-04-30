@@ -117,13 +117,40 @@ const HouseControl = {
 // Change house type when this one changes
 var houseLastType = 0;
 
+
 // Spawn House
+let roadCheckPoints = [];
+let roadOffset = -10;
+let cellSize = 10; let width = 10; let height = 10;
+
+let pathSpawner = new PathSpawner(width, height, cellSize, building);
+let grid = new Grid(width, height, cellSize);
+
 var createHouse = { add:async function(){ 
   if (MouseSelectedObj != null && MouseSelectedObj.name == "grass")
   {
     let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
-    scene.remove(MouseSelectedObj.parent)
     await FbxLoader(building.house, scene, position.x, position.y, position.z);
+
+    roadCheckPoints.push(new THREE.Vector3(position.x + roadOffset, 0, position.z));
+    grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
+    DrawLine(roadCheckPoints, scene);
+    // await pathSpawner.SpawnPath(scene);
+
+    if (roadCheckPoints.length > 1)
+    {
+      let i = roadCheckPoints.length - 2;
+      let pathNodes = [];
+      let pathFinding = new PathFinding(grid);
+  
+      pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i + 1].x / 10, roadCheckPoints[i + 1].z / 10);
+  
+      // Set spawner to spawn grid
+      pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
+      DrawLineFromPathNode(pathNodes, scene);
+
+      await pathSpawner.SpawnPath(scene);
+    }
   }
 }};
 
@@ -148,10 +175,9 @@ controls.enableDamping = true;
 
   let posiblePositionsX = [20, 40, 60, 80];
   let posiblePositionsZ = [20, 40, 60, 80];
-  let grid = new Grid(10, 10, 10);
+  
 
-  let roadCheckPoints = [];
-  let roadOffset = -10;
+  
 
   // Adding house model
   // for (let i = 0; i < 10; i++) {
@@ -179,9 +205,9 @@ controls.enableDamping = true;
 
   //   grid.gridArr[x / 10][z / 10].DisablePlacing();
   // }
-  // DrawLine(roadCheckPoints, scene);
+  // 
 
-  let pathSpawner = new PathSpawner(10, 10, 10, building);
+  await pathSpawner.SpawnGrass(scene);
 
   // for (var i = 0; i < 3; i++) {
   //   let pathNodes = [];
@@ -195,7 +221,7 @@ controls.enableDamping = true;
   //   DrawLineFromPathNode(pathNodes, scene);
   // }
 
-  await pathSpawner.SpawnPath(scene);
+  
 
   renderer.setAnimationLoop(() => {
     controls.update();
