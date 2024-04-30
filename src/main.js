@@ -85,7 +85,9 @@ controls.target.set(0, 0, 0);
 controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
-SkyboxLoader(scene);
+
+// Skybox
+// SkyboxLoader(scene);
 
 // List object
 let building = {
