@@ -10,7 +10,7 @@ export async function FbxLoader(building, scene, positionx, positiony, positionz
         if ((child as THREE.Mesh).isMesh) {
             child.name = building.name;
             if ((child as THREE.Mesh).material) {
-                var material = new THREE.MeshBasicMaterial();
+                var material = new THREE.MeshPhongMaterial();
                 material.color = new THREE.Color(0.7, 0.9, 0.9);
                 
                 if (building.tex !== "")
