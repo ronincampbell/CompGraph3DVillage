@@ -28,7 +28,7 @@ export async function FbxLoader(building, scene, positionx, positiony, positionz
 
     
     object.scale.set(building.scale, building.scale, building.scale)
-    object.position.set(positionx, positiony, positionz);
+    object.position.set(positionx + building.offset.x, positiony + building.offset.y, positionz + building.offset.z);
     scene.add(object);
     return object;
 }

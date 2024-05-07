@@ -11,6 +11,7 @@ import { PathFinding } from "./components/pathfinding/pathFinding";
 import { DrawLine, DrawLineFromPathNode } from "./components/drawLine";
 import { PathSpawner } from "./components/path/pathSpawner";
 import SkyboxLoader from "./components/skyboxLoader";
+import { lerp } from "three/src/math/MathUtils";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -56,40 +57,24 @@ addSkyGradient();
 const building = {
   house: {
     name: "house",
-    model: "../assets/house/house.fbx",
-    tex: "",
+    model: "../assets/CustomModels/NewHouse.fbx",
+    tex: "../assets/CustomModels/Textures/HouseTexture.png",
     scale: 0.04,
-    light: "",
-    offset: new THREE.Vector3(0,0,0),
-  },
-  house1: {
-    name: "house",
-    model: "../assets/house1/house.fbx",
-    tex: "../assets/house1/tex.png",
-    scale: 0.01,
-    light: "",
-    offset: new THREE.Vector3(0,0,0),
-  },
-  house2: {
-    name: "house",
-    model: "../assets/house2/house.fbx",
-    tex: "../assets/house2/normal.png",
-    scale: 0.015,
     light: "",
     offset: new THREE.Vector3(0,0,0),
   },
   path: {
     name: "path",
-    model: "../assets/path/pathJoin.fbx",
-    tex: "../assets/path/stone.png",
+    model: "../assets/CustomModels/NewPath.fbx",
+    tex: "../assets/CustomModels/Textures/PathTexture.png",
     scale: 0.05,
     light: "",
     offset: new THREE.Vector3(32,0,0),
   },
   grass: {
     name: "grass",
-    model: "../assets/path/grass.fbx",
-    tex: "../assets/path/grass.png",
+    model: "../assets/CustomModels/NewGrass.fbx",
+    tex: "../assets/CustomModels/Textures/GrassTexture.png",
     scale: 0.05,
     light: "",
     offset: new THREE.Vector3(49,0,0),
@@ -116,11 +101,11 @@ var createHouse = { add:async function(){
   if (MouseSelectedObj != null && MouseSelectedObj.name == "grass")
   {
     let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
-    await FbxLoader(building.house2, scene, position.x, position.y, position.z);
+    console.log(position);
+    await FbxLoader(building.house, scene, position.x, position.y, position.z);
 
     roadCheckPoints.push(new THREE.Vector3(position.x + roadOffset, 0, position.z));
-    grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
-    // DrawLine(roadCheckPoints, scene);
+    // grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
 
     if (roadCheckPoints.length > 1)
     {
@@ -150,6 +135,8 @@ var lightPos2 = new THREE.Vector3(50, 40, 0);
 var lightPos3 = new THREE.Vector3(100, 20, 0);
 var darkBlue = '#000435';
 var orange = '#f8aa27';
+var lightIten1 = 1;
+var lightIten2 = 5;
 
 const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3);
@@ -175,23 +162,25 @@ controls.enableDamping = true;
       var timePercent = dayCycle.time / 24;
       if (dayCycle.time <= 12)
       {
-        var lerp = dayCycle.time / 12;
+        var lerpVal = dayCycle.time / 12;
         light.color.lerpColors(
           new THREE.Color(darkBlue),
           new THREE.Color(orange),
-          lerp
+          lerpVal
         );
-        light.position.lerpVectors(lightPos1, lightPos2, lerp);
+        light.position.lerpVectors(lightPos1, lightPos2, lerpVal);
+        light.intensity = lerp(lightIten1, lightIten2, lerpVal);
       }
       else 
       {
-        var lerp = (dayCycle.time - 12) / 12;
+        var lerpVal = (dayCycle.time - 12) / 12;
         light.color.lerpColors(
           new THREE.Color(orange),
           new THREE.Color(darkBlue),
-          lerp
+          lerpVal
         );
-        light.position.lerpVectors(lightPos2, lightPos3, lerp);
+        light.position.lerpVectors(lightPos2, lightPos3, lerpVal);
+        light.intensity = lerp(lightIten2, lightIten1, lerpVal);
       }
       light.rotation.set(timePercent * 360 - 90, 170, 0);
       
@@ -226,6 +215,20 @@ controls.enableDamping = true;
     renderer.render(scene, camera);
   });
 })();
+
+  //this fucntion is called when the window is resized
+  var MyResize = function ( )
+  {
+    var width = window.innerWidth;
+    var height = window.innerHeight;
+    renderer.setSize(width,height);
+    camera.aspect = width/height;
+    camera.updateProjectionMatrix();
+    renderer.render(scene,camera);
+  };
+
+  //link the resize of the window to the update of the camera
+  window.addEventListener( 'resize', MyResize);
 
 // MOUSE CONTROL
 
