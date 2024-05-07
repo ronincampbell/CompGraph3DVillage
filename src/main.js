@@ -107,7 +107,7 @@ var houseLastType = 0;
 // Spawn House
 let roadCheckPoints = [];
 let roadOffset = -10;
-let cellSize = 10; let width = 5; let height = 5;
+let cellSize = 10; let width = 10; let height = 10;
 
 let pathSpawner = new PathSpawner(width, height, cellSize, building);
 let grid = new Grid(width, height, cellSize);
