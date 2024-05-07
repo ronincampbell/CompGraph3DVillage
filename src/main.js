@@ -40,6 +40,7 @@ document.body.appendChild(renderer.domElement);
 // Create light
 const light = GlobalLight();
 scene.add(light);
+
 // Create fog
 scene.fog = new THREE.Fog(0xffffff, 1, 500);
 
@@ -47,21 +48,6 @@ const dayCycle = {
   enable: false,
   time: 0,
 };
-
-// Create Gui
-const gui = new GUI();
-const lightFolder = gui.addFolder("Light");
-lightFolder.add(light, "intensity", 0, 10);
-lightFolder.add(light.color, "r", 0, 1);
-lightFolder.add(light.color, "g", 0, 1);
-lightFolder.add(light.color, "b", 0, 1);
-lightFolder.add(light.position, "x", -40, 40).name("sun position");
-
-const dayCycleFolder = gui.addFolder("Day");
-dayCycleFolder.add(dayCycle, "enable", false, true);
-dayCycleFolder.add(dayCycle, "time", 0, 1);
-
-
 
 // Create sky
 addSkyGradient();
@@ -121,7 +107,7 @@ var houseLastType = 0;
 // Spawn House
 let roadCheckPoints = [];
 let roadOffset = -10;
-let cellSize = 10; let width = 10; let height = 10;
+let cellSize = 10; let width = 5; let height = 5;
 
 let pathSpawner = new PathSpawner(width, height, cellSize, building);
 let grid = new Grid(width, height, cellSize);
@@ -130,12 +116,11 @@ var createHouse = { add:async function(){
   if (MouseSelectedObj != null && MouseSelectedObj.name == "grass")
   {
     let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
-    await FbxLoader(building.house, scene, position.x, position.y, position.z);
+    await FbxLoader(building.house2, scene, position.x, position.y, position.z);
 
     roadCheckPoints.push(new THREE.Vector3(position.x + roadOffset, 0, position.z));
     grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
-    DrawLine(roadCheckPoints, scene);
-    // await pathSpawner.SpawnPath(scene);
+    // DrawLine(roadCheckPoints, scene);
 
     if (roadCheckPoints.length > 1)
     {
@@ -154,11 +139,20 @@ var createHouse = { add:async function(){
   }
 }};
 
+// Create Gui
+const gui = new GUI();
+
+const dayCycleFolder = gui.addFolder("Day");
+dayCycleFolder.add(dayCycle, "enable", false, true);
+dayCycleFolder.add(dayCycle, "time", 0, 24);
+var lightPos1 = new THREE.Vector3(0, 20, 0);
+var lightPos2 = new THREE.Vector3(50, 40, 0);
+var lightPos3 = new THREE.Vector3(100, 20, 0);
+var darkBlue = '#000435';
+var orange = '#f8aa27';
+
 const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3);
-houseFolder.add(HouseControl.color, "r", 0, 1);
-houseFolder.add(HouseControl.color, "g", 0, 1);
-houseFolder.add(HouseControl.color, "b", 0, 1);
 houseFolder.add(createHouse, 'add');
 
 // Create control
@@ -178,11 +172,29 @@ controls.enableDamping = true;
     controls.update();
 
     if (dayCycle.enable) {
-      light.color.lerpColors(
-        new THREE.Color("Red"),
-        new THREE.Color("Yellow"),
-        dayCycle.time
-      );
+      var timePercent = dayCycle.time / 24;
+      if (dayCycle.time <= 12)
+      {
+        var lerp = dayCycle.time / 12;
+        light.color.lerpColors(
+          new THREE.Color(darkBlue),
+          new THREE.Color(orange),
+          lerp
+        );
+        light.position.lerpVectors(lightPos1, lightPos2, lerp);
+      }
+      else 
+      {
+        var lerp = (dayCycle.time - 12) / 12;
+        light.color.lerpColors(
+          new THREE.Color(orange),
+          new THREE.Color(darkBlue),
+          lerp
+        );
+        light.position.lerpVectors(lightPos2, lightPos3, lerp);
+      }
+      light.rotation.set(timePercent * 360 - 90, 170, 0);
+      
     }
 
     if (houseLastType != Math.round(HouseControl.type)) {
