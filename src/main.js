@@ -12,6 +12,8 @@ import { DrawLine, DrawLineFromPathNode } from "./components/drawLine";
 import { PathSpawner } from "./components/path/pathSpawner";
 import SkyboxLoader from "./components/skyboxLoader";
 import { lerp } from "three/src/math/MathUtils";
+import { TextureLoader } from "./components/textureLoader";
+// import { TextureSetter } from "./components/textureSetter";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -63,6 +65,30 @@ const building = {
     light: "",
     offset: new THREE.Vector3(0,0,0),
   },
+  houseBlue: {
+    name: "house",
+    model: "../assets/CustomModels/NewHouse.fbx",
+    tex: "../assets/CustomModels/Textures/HouseTextureBlue.png",
+    scale: 0.04,
+    light: "",
+    offset: new THREE.Vector3(0,0,0),
+  },
+  houseYellow: {
+    name: "house",
+    model: "../assets/CustomModels/NewHouse.fbx",
+    tex: "../assets/CustomModels/Textures/HouseTextureYellow.png",
+    scale: 0.04,
+    light: "",
+    offset: new THREE.Vector3(0,0,0),
+  },
+  houseGreen: {
+    name: "house",
+    model: "../assets/CustomModels/NewHouse.fbx",
+    tex: "../assets/CustomModels/Textures/HouseTextureGreen.png",
+    scale: 0.04,
+    light: "",
+    offset: new THREE.Vector3(0,0,0),
+  },
   path: {
     name: "path",
     model: "../assets/CustomModels/NewPath.fbx",
@@ -102,10 +128,10 @@ var createHouse = { add:async function(){
   {
     let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
     console.log(position);
-    await FbxLoader(building.house, scene, position.x, position.y, position.z);
+    await FbxLoader(building.houseBlue, scene, position.x, position.y, position.z);
 
-    roadCheckPoints.push(new THREE.Vector3(position.x + roadOffset, 0, position.z));
-    // grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
+    roadCheckPoints.push(new THREE.Vector3(position.x, 0, position.z - roadOffset));
+    grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
 
     if (roadCheckPoints.length > 1)
     {
@@ -155,7 +181,7 @@ controls.enableDamping = true;
 
   await pathSpawner.SpawnGrass(scene);
 
-  renderer.setAnimationLoop(() => {
+  renderer.setAnimationLoop(async () => {
     controls.update();
 
     if (dayCycle.enable) {
@@ -188,28 +214,35 @@ controls.enableDamping = true;
 
     if (houseLastType != Math.round(HouseControl.type)) {
       let position = new THREE.Vector3(0, 0, 0);
-      if (MouseSelectedObj != null) {
+      if (MouseSelectedObj != null && MouseSelectedObj.name == 'house') {
+
+        console.log("placed")
         position = MouseSelectedObj.parent.position;
         scene.remove(MouseSelectedObj.parent);
+
+        switch (houseLastType) {
+          case 0:
+            await FbxLoader(building.house, scene, position.x, position.y, position.z);
+            break;
+          case 1:
+            await FbxLoader(building.houseBlue, scene, position.x, position.y, position.z);
+            break;
+          case 2:
+            await FbxLoader(building.houseYellow, scene, position.x, position.y, position.z);
+            break;
+          case 3:
+            await FbxLoader(building.houseGreen, scene, position.x, position.y, position.z);
+            break;
+          
+        }
       }
 
       houseLastType = Math.round(HouseControl.type);
 
-      switch (houseLastType) {
-        case 0:
-          FbxLoader(building.house, scene, position.x, position.y, position.z);
-          break;
-        case 1:
-          FbxLoader(building.house1, scene, position.x, position.y, position.z);
-          break;
-        case 2:
-          FbxLoader(building.house2, scene, position.x, position.y, position.z);
-          break;
-      }
     }
 
     if (MouseSelectedObj != null) {
-      ColorSetter(MouseSelectedObj, HouseControl.color);
+      ColorSetter(MouseSelectedObj.parent, new THREE.Color("Red"));
     }
 
     renderer.render(scene, camera);
@@ -269,4 +302,19 @@ function addSkyGradient() {
   });
   var sky = new THREE.Mesh(skyGeo, skyMat);
   scene.add(sky);
+}
+
+function TextureSetter(object, tex)
+{
+    object.traverse(function (child) {
+        if (child instanceof THREE.Mesh) {
+            //create a global var to reference later when changing textures
+            child;
+            //apply texture
+            child.material.map = TextureLoader(tex);
+            child.material.needsUpdate = true;
+        }
+    })
+
+    return object;
 }
