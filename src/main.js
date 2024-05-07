@@ -30,7 +30,7 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(-17, 31, 33);
 
 // Create renderer
-const renderer = new THREE.WebGLRenderer({ antialias: true });
+const renderer = new THREE.WebGLRenderer({ antialias: true,  logarithmicDepthBuffer: true});
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
@@ -64,30 +64,34 @@ const building = {
     scale: 0.04,
     light: "",
     offset: new THREE.Vector3(0,0,0),
+    shadows: true,
   },
   houseBlue: {
     name: "house",
-    model: "../assets/CustomModels/NewHouse.fbx",
-    tex: "../assets/CustomModels/Textures/HouseTextureBlue.png",
+    model: "../assets/CustomModels/BlueHouse.fbx",
+    tex: "../assets/CustomModels/Textures/BlueHouseTex.png",
     scale: 0.04,
     light: "",
     offset: new THREE.Vector3(0,0,0),
+    shadows: true,
   },
   houseYellow: {
     name: "house",
-    model: "../assets/CustomModels/NewHouse.fbx",
-    tex: "../assets/CustomModels/Textures/HouseTextureYellow.png",
+    model: "../assets/CustomModels/YellowHouse.fbx",
+    tex: "../assets/CustomModels/Textures/YellowHouseTex.png",
     scale: 0.04,
     light: "",
     offset: new THREE.Vector3(0,0,0),
+    shadows: true,
   },
   houseGreen: {
     name: "house",
-    model: "../assets/CustomModels/NewHouse.fbx",
-    tex: "../assets/CustomModels/Textures/HouseTextureGreen.png",
+    model: "../assets/CustomModels/GreenHouse.fbx",
+    tex: "../assets/CustomModels/Textures/GreenHouseTex.png",
     scale: 0.04,
     light: "",
     offset: new THREE.Vector3(0,0,0),
+    shadows: true,
   },
   path: {
     name: "path",
@@ -96,6 +100,7 @@ const building = {
     scale: 0.05,
     light: "",
     offset: new THREE.Vector3(32,0,0),
+    shadows: false,
   },
   grass: {
     name: "grass",
@@ -104,6 +109,7 @@ const building = {
     scale: 0.05,
     light: "",
     offset: new THREE.Vector3(49,0,0),
+    shadows: false,
   },
 };
 
@@ -159,8 +165,8 @@ dayCycleFolder.add(dayCycle, "time", 0, 24);
 var lightPos1 = new THREE.Vector3(0, 20, 0);
 var lightPos2 = new THREE.Vector3(50, 40, 0);
 var lightPos3 = new THREE.Vector3(100, 20, 0);
-var darkBlue = '#000435';
-var orange = '#f8aa27';
+var darkBlue = '#FFFFFF'; //Changed to fix texture colour changes
+var orange = '#FFFFFF'; //Changed to fix texture colour changes
 var lightIten1 = 1;
 var lightIten2 = 5;
 

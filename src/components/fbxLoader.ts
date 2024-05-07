@@ -10,13 +10,19 @@ export function FbxLoader(building, scene, positionx, positiony, positionz)
         object.traverse(function (child) {
             if ((child as THREE.Mesh).isMesh) {
                 child.name = building.name;
-                child.castShadow = true;
+                //child.castShadow = true;
                 child.receiveShadow = true;
-                
+
+                if (building.shadows) {
+                    child.castShadow = true;
+                }
+
+                /* This isn't being used
                 if ((child as THREE.Mesh).material) {
                     const texture = TextureLoader(building.tex);
                     child.material.map = texture;
                 }
+                */
             }
             // if (child as THREE.DirectionalLight)
             // {
