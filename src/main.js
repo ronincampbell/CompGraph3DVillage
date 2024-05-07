@@ -177,7 +177,7 @@ var lightPos3 = new THREE.Vector3(100, 20, 0);
 var darkBlue = '#FFFFFF'; //Changed to fix texture colour changes
 var orange = '#FFFFFF'; //Changed to fix texture colour changes
 var lightIten1 = 1;
-var lightIten2 = 5;
+var lightIten2 = 20;
 
 const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3);
