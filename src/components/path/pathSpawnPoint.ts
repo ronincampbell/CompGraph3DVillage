@@ -43,7 +43,13 @@ export class PathSpawnPoint
     {
         if (this.top || this.bottom || this.left || this.right) return; 
         if (this.spawnObj != null) scene.remove(this.spawnObj);
-        this.spawnObj = await FbxLoader(this.building.grass, scene, this.x * cellSize, 0, this.y * cellSize);
+        
+        const randomNum = Math.random();
+        if (randomNum < 1/3) {
+            this.spawnObj = await FbxLoader(this.building.tree, scene, this.x * cellSize, 0, this.y * cellSize);
+        } else {
+            this.spawnObj = await FbxLoader(this.building.grass, scene, this.x * cellSize, 0, this.y * cellSize);
+        }
     }
 
     async SpawnPath(scene, cellSize): Promise<void> 

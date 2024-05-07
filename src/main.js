@@ -111,6 +111,15 @@ const building = {
     offset: new THREE.Vector3(49,0,0),
     shadows: false,
   },
+  tree: {
+    name: "tree",
+    model: "../assets/CustomModels/Treetile.fbx",
+    tex: "../assets/CustomModels/Textures/TreeTex.png",
+    scale: 0.05,
+    light: "",
+    offset: new THREE.Vector3(68.35,0,0),
+    shadows: true,
+  },
 };
 
 const HouseControl = {
