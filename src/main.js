@@ -15,7 +15,6 @@ import { lerp } from "three/src/math/MathUtils";
 import { TextureLoader } from "./components/textureLoader";
 import { add } from "three/examples/jsm/libs/tween.module.js";
 import { depth } from "three/examples/jsm/nodes/Nodes.js";
-// import { TextureSetter } from "./components/textureSetter";
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -44,8 +43,7 @@ const camera = new THREE.PerspectiveCamera(
   0.1,
   10000
 );
-// camera.position.set(20, 20, 20);
-camera.position.set(-17, 31, 33);
+camera.position.set(120, 50, 120);
 
 // Create renderer
 const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
@@ -53,7 +51,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 // Enable shadow for lighting
-//renderer.useLegacyLights = true;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
@@ -106,6 +103,7 @@ const dayCycle = {
 //addSkyGradient();
 
 // ####### NEW SKY AND CLOUDS #######
+// Addapted from https://codepen.io/Zultan/pen/mwGZBP?editors=0010
 
 // Spawn sky
 var sky;
@@ -374,9 +372,6 @@ const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
 controls.dampingFactor = 0.05;
 controls.enableDamping = true;
-
-// Skybox
-// SkyboxLoader(scene);
 
 (async function () {
 
