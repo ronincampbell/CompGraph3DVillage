@@ -209,8 +209,9 @@ controls.enableDamping = true;
           new THREE.Color(orange),
           lerpVal
         );
-        light.position.lerpVectors(lightPos1, lightPos2, lerpVal);
-        light.intensity = lerp(lightIten1, lightIten2, lerpVal);
+        //light.position.lerpVectors(lightPos1, lightPos2, lerpVal);
+        light.intensity = 10;
+        //light.intensity = lerp(lightIten1, lightIten2, lerpVal);
       }
       else 
       {
@@ -223,9 +224,18 @@ controls.enableDamping = true;
         light.position.lerpVectors(lightPos2, lightPos3, lerpVal);
         light.intensity = lerp(lightIten2, lightIten1, lerpVal);
       }
-      light.rotation.set(timePercent * 360 - 90, 170, 0);
+      const centerPoint = new THREE.Vector3(0, 0, 0);
+      const radius = 100;
+      const angle = timePercent * Math.PI * 2;
+      const x = centerPoint.x + radius * Math.cos(angle);
+      const z = centerPoint.z + radius * Math.sin(angle);
+      light.position.set(x, 100, z);
       
     }
+
+    // New ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.0005);
+    scene.add(ambientLight);
 
     if (houseLastType != Math.round(HouseControl.type)) {
       let position = new THREE.Vector3(0, 0, 0);

@@ -45,7 +45,7 @@ export class PathSpawnPoint
         if (this.spawnObj != null) scene.remove(this.spawnObj);
         
         const randomNum = Math.random();
-        if (randomNum < 1/3) {
+        if (randomNum < 1/6) {
             this.spawnObj = await FbxLoader(this.building.tree, scene, this.x * cellSize, 0, this.y * cellSize);
         } else {
             this.spawnObj = await FbxLoader(this.building.grass, scene, this.x * cellSize, 0, this.y * cellSize);
