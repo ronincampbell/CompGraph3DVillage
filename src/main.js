@@ -13,11 +13,29 @@ import { PathSpawner } from "./components/path/pathSpawner";
 import SkyboxLoader from "./components/skyboxLoader";
 import { lerp } from "three/src/math/MathUtils";
 import { TextureLoader } from "./components/textureLoader";
+import { add } from "three/examples/jsm/libs/tween.module.js";
+import { depth } from "three/examples/jsm/nodes/Nodes.js";
 // import { TextureSetter } from "./components/textureSetter";
 
 // Create scene and background
 const scene = new THREE.Scene();
-scene.background = new THREE.Color("#FFEECC");
+scene.background = new THREE.Color("#CCE2FF");
+
+// Colors
+var Colors = {
+  red: 0xf25346,
+  yellow: 0xedeb27,
+  white: 0xd8d0d1,
+  brown: 0x59332e,
+  pink: 0xF5986E,
+  brownDark: 0x23190f,
+  blue: 0x68c3c0,
+  green: 0x458248,
+  purple: 0x551A8B,
+  lightgreen: 0x629265,
+};
+
+var HouseLights = [];
 
 // Create camera
 const camera = new THREE.PerspectiveCamera(
@@ -30,22 +48,54 @@ const camera = new THREE.PerspectiveCamera(
 camera.position.set(-17, 31, 33);
 
 // Create renderer
-const renderer = new THREE.WebGLRenderer({ antialias: true,  logarithmicDepthBuffer: true});
+const renderer = new THREE.WebGLRenderer({ antialias: true, logarithmicDepthBuffer: true });
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 // Enable shadow for lighting
-renderer.useLegacyLights = true;
+//renderer.useLegacyLights = true;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
+// Create Sky
+createSky();
 
-// Create light
-const light = GlobalLight();
-scene.add(light);
+// ####### NEW LIGHTING #######
+var hemisphereLight, shadowLight;
+createLights(2.9);
+function createLights(intensity) {
+  if (hemisphereLight != null) {
+    scene.remove(hemisphereLight);
+    scene.remove(shadowLight);
+  }
+  // Gradient coloured light - Sky, Ground, Intensity
+  hemisphereLight = new THREE.HemisphereLight(0x54ebff, 0x000000, intensity)
+  // Parallel rays
+  shadowLight = new THREE.DirectionalLight(0xffffff, intensity);
+
+  shadowLight.position.set(0, 350, 350);
+  shadowLight.castShadow = true;
+
+  // define the visible area of the projected shadow
+  shadowLight.shadow.camera.left = -650;
+  shadowLight.shadow.camera.right = 650;
+  shadowLight.shadow.camera.top = 650;
+  shadowLight.shadow.camera.bottom = -650;
+  shadowLight.shadow.camera.near = 1;
+  shadowLight.shadow.camera.far = 1000;
+
+  // Shadow map size
+  shadowLight.shadow.mapSize.width = 2048;
+  shadowLight.shadow.mapSize.height = 2048;
+
+  // Add the lights to the scene
+  scene.add(hemisphereLight);
+
+  scene.add(shadowLight);
+}
 
 // Create fog
-scene.fog = new THREE.Fog(0xffffff, 1, 500);
+scene.fog = new THREE.Fog(0xCCE2FF, 1, 500);
 
 const dayCycle = {
   enable: false,
@@ -53,7 +103,76 @@ const dayCycle = {
 };
 
 // Create sky
-addSkyGradient();
+//addSkyGradient();
+
+// ####### NEW SKY AND CLOUDS #######
+
+// Spawn sky
+var sky;
+function createSky() {
+  sky = new Sky();
+  sky.mesh.position.y = 150;
+  scene.add(sky.mesh);
+}
+
+function Cloud() {
+  // Create an empty container for the cloud
+  this.mesh = new THREE.Object3D();
+  // Cube geometry and material
+  var geom = new THREE.DodecahedronGeometry(20, 0);
+  var mat = new THREE.MeshPhongMaterial({
+    color: Colors.white,
+    // make translucent
+    transparent: true,
+    opacity: 0.7,
+  });
+
+  var nBlocs = 3 + Math.floor(Math.random() * 3);
+
+  for (var i = 0; i < nBlocs; i++) {
+    //Clone mesh geometry
+    var m = new THREE.Mesh(geom, mat);
+    //Randomly position each cube
+    m.position.x = Math.random() * 100 - 50;
+    m.position.y = Math.random() * 10;
+    m.position.z = Math.random() * 100 - 50;
+    m.rotation.z = Math.random() * Math.PI * 2;
+    m.rotation.y = Math.random() * Math.PI * 2;
+
+    //Randomly scale the cubes
+    var s = 0.1 + Math.random() * 0.9;
+    m.scale.set(s, s, s);
+    this.mesh.add(m);
+  }
+}
+
+function Sky() {
+  this.mesh = new THREE.Object3D();
+
+  // Number of cloud groups
+  this.nClouds = 25;
+
+  // Create the Clouds
+  for (var i = 0; i < this.nClouds; i++) {
+    var c = new Cloud();
+
+    // Randomly position each cloud
+    c.mesh.position.x = Math.random() * 1000 - 500;
+    c.mesh.position.y = Math.random() * 10;
+    c.mesh.position.z = Math.random() * 1000 - 500;
+
+    // Randomly rotate each cloud
+    c.mesh.rotation.z = Math.random() * Math.PI * 2;
+    c.mesh.rotation.y = Math.random() * Math.PI * 2;
+
+    // Randomly scale each cloud
+    var s = 1 + Math.random() / 2;
+    c.mesh.scale.set(s, s, s);
+
+    this.mesh.add(c.mesh);
+  }
+}
+
 
 // List object
 const building = {
@@ -63,7 +182,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/HouseTexture.png",
     scale: 0.04,
     light: "",
-    offset: new THREE.Vector3(0,0,0),
+    offset: new THREE.Vector3(0, 0, 0),
     shadows: true,
   },
   houseBlue: {
@@ -72,7 +191,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/BlueHouseTex.png",
     scale: 0.04,
     light: "",
-    offset: new THREE.Vector3(0,0,0),
+    offset: new THREE.Vector3(0, 0, 0),
     shadows: true,
   },
   houseYellow: {
@@ -81,7 +200,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/YellowHouseTex.png",
     scale: 0.04,
     light: "",
-    offset: new THREE.Vector3(0,0,0),
+    offset: new THREE.Vector3(0, 0, 0),
     shadows: true,
   },
   houseGreen: {
@@ -90,7 +209,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/GreenHouseTex.png",
     scale: 0.04,
     light: "",
-    offset: new THREE.Vector3(0,0,0),
+    offset: new THREE.Vector3(0, 0, 0),
     shadows: true,
   },
   path: {
@@ -99,7 +218,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/PathTexture.png",
     scale: 0.05,
     light: "",
-    offset: new THREE.Vector3(32,0,0),
+    offset: new THREE.Vector3(32, 0, 0),
     shadows: false,
   },
   grass: {
@@ -108,7 +227,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/GrassTexture.png",
     scale: 0.05,
     light: "",
-    offset: new THREE.Vector3(49,0,0),
+    offset: new THREE.Vector3(49, 0, 0),
     shadows: false,
   },
   tree: {
@@ -117,7 +236,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/TreeTex.png",
     scale: 0.05,
     light: "",
-    offset: new THREE.Vector3(68.35,0,0),
+    offset: new THREE.Vector3(68.35, 0, 0),
     shadows: true,
   },
 };
@@ -129,7 +248,6 @@ const HouseControl = {
 // Change house type when this one changes
 var houseLastType = 0;
 
-
 // Spawn House
 let roadCheckPoints = [];
 let roadOffset = -10;
@@ -138,46 +256,114 @@ let cellSize = 10; let width = 10; let height = 10;
 let pathSpawner = new PathSpawner(width, height, cellSize, building);
 let grid = new Grid(width, height, cellSize);
 
-var createHouse = { add:async function(){ 
-  if (MouseSelectedObj != null && MouseSelectedObj.name == "grass")
-  {
-    let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
-    console.log(position);
-    await FbxLoader(building.houseBlue, scene, position.x, position.y, position.z);
+var createHouse = {
+  add: async function () {
+    if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
+      let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
+      console.log(position);
+      await FbxLoader(building.houseBlue, scene, position.x, position.y, position.z);
+      addHouseLight(position.x, position.y, position.z);
 
-    roadCheckPoints.push(new THREE.Vector3(position.x, 0, position.z - roadOffset));
-    grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
+      roadCheckPoints.push(new THREE.Vector3(position.x, 0, position.z - roadOffset));
+      grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
 
-    if (roadCheckPoints.length > 1)
-    {
-      let i = roadCheckPoints.length - 2;
-      let pathNodes = [];
-      let pathFinding = new PathFinding(grid);
-  
-      pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i + 1].x / 10, roadCheckPoints[i + 1].z / 10);
-  
-      // Set spawner to spawn grid
-      pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
-      DrawLineFromPathNode(pathNodes, scene);
+      if (roadCheckPoints.length > 1) {
+        let i = roadCheckPoints.length - 2;
+        let pathNodes = [];
+        let pathFinding = new PathFinding(grid);
 
-      await pathSpawner.SpawnPath(scene);
+        pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i + 1].x / 10, roadCheckPoints[i + 1].z / 10);
+
+        // Set spawner to spawn grid
+        pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
+        DrawLineFromPathNode(pathNodes, scene);
+
+        await pathSpawner.SpawnPath(scene);
+      }
     }
   }
-}};
+};
+
+// ###### FIREFLIES SHADER ######
+const ffGeometry = new THREE.BufferGeometry();
+const ffCount = 500;
+const ffPositions = new Float32Array(ffCount * 3);
+
+for (let i = 0; i < ffCount * 3; i++) {
+  ffPositions[i] = Math.random() * 100 + 5;
+}
+
+ffGeometry.setAttribute("position", new THREE.BufferAttribute(ffPositions, 3));
+
+const ffSizes = new Float32Array(ffCount);
+for (let i = 0; i < ffCount; i++) {
+  ffSizes[i] = Math.random() * 5 + 1;
+}
+
+ffGeometry.setAttribute("size", new THREE.BufferAttribute(ffSizes, 1));
+
+const ffMaterial = new THREE.ShaderMaterial({
+  vertexShader: ffVertexShader(),
+  fragmentShader: ffFragmentShader(),
+  uniforms: {
+    time: { value: 0 },
+  },
+  transparent: true,
+  opacity: 0.5,
+  depthWrite: false, 
+  blending: THREE.AdditiveBlending,
+});
+
+const fireflies = new THREE.Points(ffGeometry, ffMaterial);
+scene.add(fireflies);
+fireflies.visible = false;
+
+function ffVertexShader() {
+  return `
+      uniform float time;
+      attribute float size;
+      varying float vOpacity;
+
+      void main() {
+          vec3 pos = position;
+
+          // Simulate movement
+          pos.y += sin(time + position.x * 10.0) * 0.1;
+
+          // Apply size and position transformations
+          gl_PointSize = size * (1.0 + sin(time * 2.0 + length(pos) * 5.0));
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(pos, 1.0);
+
+          // Varying opacity for flickering effect
+          vOpacity = 0.5 + 0.5 * sin(time * 3.0 + position.x * 20.0);
+      }
+  `;
+}
+
+function ffFragmentShader() {
+  return `
+      varying float vOpacity;
+      void main() {
+          gl_FragColor = vec4(1.0, 1.0, 0.6, vOpacity); // Yellowish color
+      }
+  `;
+}
 
 // Create Gui
 const gui = new GUI();
 
-const dayCycleFolder = gui.addFolder("Day");
-dayCycleFolder.add(dayCycle, "enable", false, true);
-dayCycleFolder.add(dayCycle, "time", 0, 24);
-var lightPos1 = new THREE.Vector3(0, 20, 0);
-var lightPos2 = new THREE.Vector3(50, 40, 0);
-var lightPos3 = new THREE.Vector3(100, 20, 0);
-var darkBlue = '#FFFFFF'; //Changed to fix texture colour changes
-var orange = '#FFFFFF'; //Changed to fix texture colour changes
-var lightIten1 = 1;
-var lightIten2 = 20;
+const dayFolder = gui.addFolder("Day/Night");
+dayFolder.add(dayCycle, "enable").onChange(() => {
+  if (dayCycle.enable) {
+    scene.background = new THREE.Color("#000D1F"); // Night color
+    scene.fog = new THREE.Fog(0x000D1F, 1, 500); // Night fog
+    createLights(0.5);
+  } else {
+    scene.background = new THREE.Color("#CCE2FF"); // Day color
+    scene.fog = new THREE.Fog(0xCCE2FF, 1, 500); // Day fog
+    createLights(2.9);
+  }
+});
 
 const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3);
@@ -200,42 +386,14 @@ controls.enableDamping = true;
     controls.update();
 
     if (dayCycle.enable) {
-      var timePercent = dayCycle.time / 24;
-      if (dayCycle.time <= 12)
-      {
-        var lerpVal = dayCycle.time / 12;
-        light.color.lerpColors(
-          new THREE.Color(darkBlue),
-          new THREE.Color(orange),
-          lerpVal
-        );
-        //light.position.lerpVectors(lightPos1, lightPos2, lerpVal);
-        light.intensity = 10;
-        //light.intensity = lerp(lightIten1, lightIten2, lerpVal);
-      }
-      else 
-      {
-        var lerpVal = (dayCycle.time - 12) / 12;
-        light.color.lerpColors(
-          new THREE.Color(orange),
-          new THREE.Color(darkBlue),
-          lerpVal
-        );
-        light.position.lerpVectors(lightPos2, lightPos3, lerpVal);
-        light.intensity = lerp(lightIten2, lightIten1, lerpVal);
-      }
-      const centerPoint = new THREE.Vector3(0, 0, 0);
-      const radius = 100;
-      const angle = timePercent * Math.PI * 2;
-      const x = centerPoint.x + radius * Math.cos(angle);
-      const z = centerPoint.z + radius * Math.sin(angle);
-      light.position.set(x, 100, z);
-      
+      HouseLights.forEach(light => light.intensity = 500); // Night time intensity
+      // make fireflies visible
+      fireflies.visible = true;
+    } else {
+      HouseLights.forEach(light => light.intensity = 0); // Day time intensity, turn off lights
+      // make fireflies invisible
+      fireflies.visible = false;
     }
-
-    // New ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.0005);
-    scene.add(ambientLight);
 
     if (houseLastType != Math.round(HouseControl.type)) {
       let position = new THREE.Vector3(0, 0, 0);
@@ -258,7 +416,7 @@ controls.enableDamping = true;
           case 3:
             await FbxLoader(building.houseGreen, scene, position.x, position.y, position.z);
             break;
-          
+
         }
       }
 
@@ -274,19 +432,26 @@ controls.enableDamping = true;
   });
 })();
 
-  //this fucntion is called when the window is resized
-  var MyResize = function ( )
-  {
-    var width = window.innerWidth;
-    var height = window.innerHeight;
-    renderer.setSize(width,height);
-    camera.aspect = width/height;
-    camera.updateProjectionMatrix();
-    renderer.render(scene,camera);
-  };
+// ####### HOUSE LIGHT FUNCTIONS #######
+function addHouseLight(PosX, PosY, PosZ){
+  var lightIntensity = dayCycle.enable ? 500 : 0;
+  var light = new THREE.PointLight(0xede387, lightIntensity, 100);
+  light.position.set(PosX-2.75, PosY + 4.25, PosZ + 5);
+  scene.add(light);
+  HouseLights.push(light);
+}
+//this fucntion is called when the window is resized
+var MyResize = function () {
+  var width = window.innerWidth;
+  var height = window.innerHeight;
+  renderer.setSize(width, height);
+  camera.aspect = width / height;
+  camera.updateProjectionMatrix();
+  renderer.render(scene, camera);
+};
 
-  //link the resize of the window to the update of the camera
-  window.addEventListener( 'resize', MyResize);
+//link the resize of the window to the update of the camera
+window.addEventListener('resize', MyResize);
 
 // MOUSE CONTROL
 
@@ -329,17 +494,27 @@ function addSkyGradient() {
   scene.add(sky);
 }
 
-function TextureSetter(object, tex)
-{
-    object.traverse(function (child) {
-        if (child instanceof THREE.Mesh) {
-            //create a global var to reference later when changing textures
-            child;
-            //apply texture
-            child.material.map = TextureLoader(tex);
-            child.material.needsUpdate = true;
-        }
-    })
+function TextureSetter(object, tex) {
+  object.traverse(function (child) {
+    if (child instanceof THREE.Mesh) {
+      //create a global var to reference later when changing textures
+      child;
+      //apply texture
+      child.material.map = TextureLoader(tex);
+      child.material.needsUpdate = true;
+    }
+  })
 
-    return object;
+  return object;
 }
+
+let clock = new THREE.Clock();
+
+function animate() {
+    let deltaTime = clock.getDelta();
+    fireflies.material.uniforms.time.value += deltaTime;
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+}
+
+animate();
