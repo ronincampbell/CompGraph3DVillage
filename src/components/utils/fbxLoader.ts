@@ -1,6 +1,5 @@
 import * as THREE from 'three'
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader"
-import { TextureLoader } from './textureLoader'
 
 export async function FbxLoader(building, scene, loadingManager, positionx, positiony, positionz)
 {
@@ -17,18 +16,7 @@ export async function FbxLoader(building, scene, loadingManager, positionx, posi
             if (building.shadows) {
                 child.castShadow = true;
             }
-
-            /* This isn't being used
-            if ((child as THREE.Mesh).material) {
-                const texture = TextureLoader(building.tex);
-                child.material.map = texture;
-            }
-            */
         }
-        // if (child as THREE.DirectionalLight)
-        // {
-        //     child.intensity = 0.1;
-        // }
     })
 
     object.scale.set(building.scale, building.scale, building.scale)

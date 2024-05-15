@@ -9,6 +9,9 @@ import { PathFinding } from "./components/pathfinding/pathFinding";
 import { DrawLineFromPathNode } from "./components/utils/drawLine";
 import { PathSpawner } from "./components/path/pathSpawner";
 
+import toonShaderFrag from "./shaders/toonShaderFrag.glsl?raw"
+import toonShaderVert from "./shaders/toonShaderVert.glsl?raw"
+
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -234,6 +237,10 @@ const building = {
     light: "",
     offset: new THREE.Vector3(49, 0, 0),
     shadows: false,
+    shaderMaterial: new THREE.ShaderMaterial({
+      vertexShader: toonShaderFrag,
+      fragmentShader: toonShaderVert
+    })
   },
   tree: {
     name: "tree",
