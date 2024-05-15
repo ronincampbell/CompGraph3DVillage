@@ -8,10 +8,38 @@
     <link rel="stylesheet" href="./src/css/style.css">
 </head>
 <body>
-    <section class="progress-bar-container">
-        <label for="progress-bar">Loading...</label>
-        <progress id="progress-bar" value="0" max="100"></progress>
-    </section>
+    <div class="flex">
+        <div class="sidebar">
+            <h2>Customize</h2>
+            <ul>
+                <li>
+                    <button class="sidebar-button" data-action="action1">
+                        <img src="./images/house.png" alt="Image" class="icon">
+                        House
+                    </button>
+                </li>
+                <li>
+                    <button class="sidebar-button" data-action="action2">
+                        <img src="./images/tree.png" alt="Image" class="icon">
+                        Tree
+                    </button>
+                </li>
+            </ul>
+        </div>
+        <div class="flex-grow p-4">
+            <section class="progress-bar-container mb-4">
+                <label for="progress-bar" class="block mb-2">Loading...</label>
+                <progress id="progress-bar" value="0" max="100" class="w-full"></progress>
+            </section>
+            <div id="threejs-container" class="h-full"></div>
+        </div>
+    </div>
     <script type="module" src="src/main.js"></script>
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            sidebar.classList.toggle('open');
+        }
+    </script>
 </body>
 </html>

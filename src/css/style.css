@@ -5,6 +5,65 @@ body {
     font-family: 'Monsterrat', 'sans-serif';
 }
 
+/* Add image icon styles */
+.icon {
+    display: inline-block;
+    object-fit: cover;
+    width: 220px; /* Set the width of the image */
+    height: 220px; /* Set the height of the image */
+    margin-right: 5px; /* Adjust spacing between image and text */
+    vertical-align: middle; /* Align the image vertically with the text */
+    padding-bottom: 20px;
+}
+
+.sidebar {
+    width: 250px;
+    background-color: rgba(45, 55, 72, 0.8);
+    color: white;
+    padding: 20px;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    transition: left 0.3s ease; /* Add transition for smooth animation */
+}
+
+.sidebar h2 {
+    font-size: 1.5rem;
+    margin-bottom: 20px;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    padding: 10px;
+    cursor: pointer;
+    margin-bottom: 20px;
+}
+
+/* Adjust button styles to match li styles */
+.sidebar ul li button {
+    background-color: transparent; /* Remove default button background color */
+    color: inherit; /* Inherit text color from parent li */
+    border: none; /* Remove default button border */
+    cursor: pointer; /* Change cursor to pointer */
+    padding: 0; /* Remove default button padding */
+    width: 100%; /* Set button width to match parent li */
+    height: 100%; /* Set button height to match parent li */
+    font-size: 1.5rem;
+}
+
+.sidebar ul li:hover {
+    background-color: #4a5568;
+}
+
+.progress-bar-container {
+    margin-bottom: 10px;
+}
+
+
 .progress-bar-container {
     position: absolute;
     left: 50%;

@@ -266,7 +266,7 @@ var createHouse = {
     if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
       let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
       console.log(position);
-      await FbxLoader(building.houseBlue, scene, position.x, position.y, position.z);
+      await FbxLoader(building.houseBlue, scene, loadingManager, position.x, position.y, position.z);
       addHouseLight(position.x, position.y, position.z);
 
       roadCheckPoints.push(new THREE.Vector3(position.x, 0, position.z - roadOffset));
@@ -288,6 +288,34 @@ var createHouse = {
     }
   }
 };
+
+// Define actions for each button click
+const actions = {
+  action1: () => {
+    createHouse.add();
+  },
+  action2: () => {
+      // Define action for Item 2 button
+      console.log('Item 2 button clicked');
+      // Example: Rotate a Three.js object
+  },
+  action3: () => {
+      // Define action for Item 3 button
+      console.log('Item 3 button clicked');
+      // Example: Scale a Three.js object
+  }
+};
+
+// Add event listeners to each button
+const buttons = document.querySelectorAll('.sidebar-button');
+buttons.forEach(button => {
+  button.addEventListener('click', () => {
+      const action = button.dataset.action;
+      if (actions[action]) {
+          actions[action]();
+      }
+  });
+});
 
 // ###### FIREFLIES SHADER ######
 const ffGeometry = new THREE.BufferGeometry();
