@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { PathNode } from '../pathfinding/pathNode';
-import { FbxLoader } from '../fbxLoader';
+import { FbxLoader } from '../utils/fbxLoader';
 
 export class PathSpawnPoint 
 {
@@ -39,25 +39,25 @@ export class PathSpawnPoint
         }
     }
 
-    async SpawnGrass(scene, cellSize): Promise<void> 
+    async SpawnGrass(scene, loadingManager, cellSize): Promise<void> 
     {
         if (this.top || this.bottom || this.left || this.right) return; 
         if (this.spawnObj != null) scene.remove(this.spawnObj);
         
         const randomNum = Math.random();
         if (randomNum < 1/6) {
-            this.spawnObj = await FbxLoader(this.building.tree, scene, this.x * cellSize, 0, this.y * cellSize);
+            this.spawnObj = await FbxLoader(this.building.tree, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
         } else {
-            this.spawnObj = await FbxLoader(this.building.grass, scene, this.x * cellSize, 0, this.y * cellSize);
+            this.spawnObj = await FbxLoader(this.building.grass, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
         }
     }
 
-    async SpawnPath(scene, cellSize): Promise<void> 
+    async SpawnPath(scene, loadingManager, cellSize): Promise<void> 
     {
         if (this.top || this.bottom || this.left || this.right)
         {
             if (this.spawnObj != null) scene.remove(this.spawnObj);
-            this.spawnObj = await FbxLoader(this.building.path, scene, this.x * cellSize, 0, this.y * cellSize);
+            this.spawnObj = await FbxLoader(this.building.path, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
         }
     }
 }

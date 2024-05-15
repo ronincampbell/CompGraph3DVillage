@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { PathNode } from "./pathfinding/pathNode";
+import { PathNode } from "../pathfinding/pathNode";
 
 export function DrawLine(points, scene, color) {
     const material = new THREE.LineBasicMaterial( { color: color } );

@@ -1,20 +1,14 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { EnvMapLoader } from "./components/envMapLoader";
-import { GlobalLight } from "./components/globalLight";
 import { GUI } from "dat.gui";
-import { FbxLoader } from "./components/fbxLoader";
-import { MouseControl, MouseSelectedObj } from "./components/mouseControl";
-import { ColorSetter } from "./components/colorSetter";
+import { FbxLoader } from "./components/utils/fbxLoader";
+import { MouseControl, MouseSelectedObj } from "./components/utils/mouseControl";
+import { ColorSetter } from "./components/utils/colorSetter";
 import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
-import { DrawLine, DrawLineFromPathNode } from "./components/drawLine";
+import { DrawLineFromPathNode } from "./components/utils/drawLine";
 import { PathSpawner } from "./components/path/pathSpawner";
-import SkyboxLoader from "./components/skyboxLoader";
-import { lerp } from "three/src/math/MathUtils";
-import { TextureLoader } from "./components/textureLoader";
-import { add } from "three/examples/jsm/libs/tween.module.js";
-import { depth } from "three/examples/jsm/nodes/Nodes.js";
+
 
 // Create scene and background
 const scene = new THREE.Scene();
@@ -171,6 +165,19 @@ function Sky() {
   }
 }
 
+const progressBar = document.getElementById('progress-bar');
+const progressBarContainer = document.querySelector('.progress-bar-container');
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onProgress = function(url, loaded, total) 
+{
+  progressBar.value = (loaded/total) * 100;
+}
+
+loadingManager.onLoad = function() 
+{
+  progressBarContainer.style.display = 'none';
+}
 
 // List object
 const building = {
@@ -276,7 +283,7 @@ var createHouse = {
         pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
         DrawLineFromPathNode(pathNodes, scene);
 
-        await pathSpawner.SpawnPath(scene);
+        await pathSpawner.SpawnPath(scene, loadingManager);
       }
     }
   }
@@ -375,7 +382,7 @@ controls.enableDamping = true;
 
 (async function () {
 
-  await pathSpawner.SpawnGrass(scene);
+  await pathSpawner.SpawnGrass(scene, loadingManager);
 
   renderer.setAnimationLoop(async () => {
     controls.update();
@@ -487,20 +494,6 @@ function addSkyGradient() {
   });
   var sky = new THREE.Mesh(skyGeo, skyMat);
   scene.add(sky);
-}
-
-function TextureSetter(object, tex) {
-  object.traverse(function (child) {
-    if (child instanceof THREE.Mesh) {
-      //create a global var to reference later when changing textures
-      child;
-      //apply texture
-      child.material.map = TextureLoader(tex);
-      child.material.needsUpdate = true;
-    }
-  })
-
-  return object;
 }
 
 let clock = new THREE.Clock();

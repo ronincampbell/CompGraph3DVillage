@@ -49,24 +49,24 @@ export class PathSpawner
         this.pathSpawnPoints[cameFrom.x][cameFrom.y].SetCameFrom(pathNode);
     }
 
-    async SpawnGrass(scene) : Promise<void> 
+    async SpawnGrass(scene, loadingManager) : Promise<void> 
     {
         for (var i = 0; i < this.width; i++)
         {
             for (var j = 0; j < this.height; j++)
             {
-                await this.pathSpawnPoints[i][j].SpawnGrass(scene, this.cellSize);
+                await this.pathSpawnPoints[i][j].SpawnGrass(scene, loadingManager, this.cellSize);
             }
         }
     }
 
-    async SpawnPath(scene) : Promise<void> 
+    async SpawnPath(scene, loadingManager) : Promise<void> 
     {
         for (var i = 0; i < this.width; i++)
         {
             for (var j = 0; j < this.height; j++)
             {
-                await this.pathSpawnPoints[i][j].SpawnPath(scene, this.cellSize);
+                await this.pathSpawnPoints[i][j].SpawnPath(scene, loadingManager, this.cellSize);
             }
         }
     }

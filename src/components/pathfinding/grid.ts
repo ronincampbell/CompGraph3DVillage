@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { DrawLineFrom2Point } from "../drawLine";
+import { DrawLineFrom2Point } from "../utils/drawLine";
 import { PathNode } from './pathNode';
 
 
