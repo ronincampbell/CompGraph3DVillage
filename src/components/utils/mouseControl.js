@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 
 export var MouseSelectedObj = null;
-var lastColor;
+var lastColor = [];
 
 export function MouseControl(document, renderer, camera, scene) {
     var raycaster = new THREE.Raycaster();
@@ -20,13 +20,22 @@ export function MouseControl(document, renderer, camera, scene) {
             {
                 if (MouseSelectedObj != null)
                 {
-                    MouseSelectedObj.material.color = lastColor;
+                    for (var i = 0; i < MouseSelectedObj.material.length; i++)
+                    {
+                        MouseSelectedObj.material[i].color = lastColor[i]
+                    }
                 }
 
                 MouseSelectedObj = intersects[0].object;
-                MouseSelectedObj.material.color = new THREE.Color('Red');
-                lastColor = MouseSelectedObj.material.color;
 
+                lastColor = [];
+                for (var i = 0; i < MouseSelectedObj.material.length; i++)
+                {
+                    lastColor.push(MouseSelectedObj.material[i].color)
+                    MouseSelectedObj.material[i].color = new THREE.Color("Black")
+                }
+                
+                
             }
         }
     }
