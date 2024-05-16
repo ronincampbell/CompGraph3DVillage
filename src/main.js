@@ -8,11 +8,11 @@ import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
 import { DrawLineFromPathNode } from "./components/utils/drawLine";
 import { PathSpawner } from "./components/path/pathSpawner";
+import { Animator } from "./components/utils/animator";
+import { Move } from "./components/utils/animalmovement";
 
 import toonShaderFrag from "./shaders/toonShaderFrag.glsl?raw"
 import toonShaderVert from "./shaders/toonShaderVert.glsl?raw"
-import { Animator } from "./components/utils/animator";
-import { Move } from "./components/utils/animalmovement";
 
 
 // Create scene and background
@@ -192,16 +192,16 @@ const building = {
     tex: "../assets/CustomModels/Textures/HouseTexture.png",
     scale: 0.04,
     light: "",
-    offset: new THREE.Vector3(0, 0, 0),
+    offset: new THREE.Vector3(0, 1, 0),
     shadows: true,
   },
   houseBlue: {
     name: "house",
-    model: "../assets/CustomModels/BlueHouse.fbx",
+    model: "../assets/CustomModels/BlueHouse1.fbx",
     tex: "../assets/CustomModels/Textures/BlueHouseTex.png",
     scale: 0.04,
     light: "",
-    offset: new THREE.Vector3(0, 0, 0),
+    offset: new THREE.Vector3(0, 1, 0),
     shadows: true,
   },
   houseYellow: {
@@ -224,7 +224,7 @@ const building = {
   },
   path: {
     name: "path",
-    model: "../assets/CustomModels/NewPath.fbx",
+    model: "../assets/CustomModels/NewPath1.fbx",
     tex: "../assets/CustomModels/Textures/PathTexture.png",
     scale: 0.05,
     light: "",
@@ -233,7 +233,7 @@ const building = {
   },
   grass: {
     name: "grass",
-    model: "../assets/CustomModels/NewGrass.fbx",
+    model: "../assets/CustomModels/NewGrass1.fbx",
     tex: "../assets/CustomModels/Textures/GrassTexture.png",
     scale: 0.05,
     light: "",
@@ -265,17 +265,20 @@ const animatedmodel =
     light: "",
     offset: new THREE.Vector3(0, 30, 0),
     shadows: true,
-    speed: 0.1,
+    speed: 0.3,
   },
 }
 
+////////////////// WATER SHADER //////////////////////
+
+
+
 let spawnanimatedmodels = [];
 
-for (var i = 0; i < 10; i++)
+for (var i = 0; i < 5; i++)
 {
   await FbxLoader(animatedmodel.bird, scene, loadingManager, Math.random() * 100 - 30, Math.random() * 30, Math.random() * 100 - 30, spawnanimatedmodels);
 }
-
 
 const HouseControl = {
   type: 0,
@@ -287,7 +290,7 @@ var houseLastType = 0;
 // Spawn House
 let roadCheckPoints = [];
 let roadOffset = -10;
-let cellSize = 10; let width = 10; let height = 10;
+let cellSize = 10; let width = 7; let height = 7;
 
 let pathSpawner = new PathSpawner(width, height, cellSize, building);
 let grid = new Grid(width, height, cellSize);
@@ -312,7 +315,6 @@ var createHouse = {
 
         // Set spawner to spawn grid
         pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
-        DrawLineFromPathNode(pathNodes, scene);
 
         await pathSpawner.SpawnPath(scene, loadingManager);
       }
@@ -504,6 +506,7 @@ function addHouseLight(PosX, PosY, PosZ){
   scene.add(light);
   HouseLights.push(light);
 }
+
 //this fucntion is called when the window is resized
 var MyResize = function () {
   var width = window.innerWidth;

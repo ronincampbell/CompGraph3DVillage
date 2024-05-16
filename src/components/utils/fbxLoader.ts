@@ -42,5 +42,5 @@ export async function FbxLoader(building, scene, loadingManager, positionx, posi
 
     if (animatedObjects != null) animatedObjects.push(animatedObject)
     
-    return {object};
+    return object;
 }
