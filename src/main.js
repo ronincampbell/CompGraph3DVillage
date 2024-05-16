@@ -11,6 +11,8 @@ import { PathSpawner } from "./components/path/pathSpawner";
 
 import toonShaderFrag from "./shaders/toonShaderFrag.glsl?raw"
 import toonShaderVert from "./shaders/toonShaderVert.glsl?raw"
+import { Animator } from "./components/utils/animator";
+import { Move } from "./components/utils/animalmovement";
 
 
 // Create scene and background
@@ -253,6 +255,28 @@ const building = {
   },
 };
 
+const animatedmodel = 
+{
+  bird: {
+    name: "tree",
+    model: "../assets/bird/bird.fbx",
+    tex: "../assets/bird/tex.jpeg",
+    scale: 1,
+    light: "",
+    offset: new THREE.Vector3(0, 30, 0),
+    shadows: true,
+    speed: 0.1,
+  },
+}
+
+let spawnanimatedmodels = [];
+
+for (var i = 0; i < 10; i++)
+{
+  await FbxLoader(animatedmodel.bird, scene, loadingManager, Math.random() * 100 - 30, Math.random() * 30, Math.random() * 100 - 30, spawnanimatedmodels);
+}
+
+
 const HouseControl = {
   type: 0,
   color: new THREE.Color(1, 0, 0),
@@ -416,11 +440,14 @@ controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
 (async function () {
-
+  // Spawn grass
   await pathSpawner.SpawnGrass(scene, loadingManager);
 
   renderer.setAnimationLoop(async () => {
     controls.update();
+
+    Animator(spawnanimatedmodels)
+    Move(spawnanimatedmodels)
 
     if (dayCycle.enable) {
       HouseLights.forEach(light => light.intensity = 500); // Night time intensity
