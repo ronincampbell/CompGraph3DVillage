@@ -10,22 +10,43 @@
 <body>
     <div class="flex">
         <div class="sidebar">
-            <h2>Customize</h2>
-            <ul>
-                <li>
+            <div class="nav-buttons">
+                <button id="prev-button" class="nav-button">Previous</button>
+                <button id="next-button" class="nav-button">Next</button>
+            </div>
+            <ul id="item-list">
+                <li class="sidebar-item">
                     <button class="sidebar-button" data-action="action1">
                         <img src="./images/house.png" alt="Image" class="icon">
                         House
                     </button>
                 </li>
-                <li>
+                <li class="sidebar-item">
                     <button class="sidebar-button" data-action="action2">
                         <img src="./images/tree.png" alt="Image" class="icon">
                         Tree
                     </button>
                 </li>
-                <li>
+                <li class="sidebar-item">
                     <button class="sidebar-button" data-action="action3">
+                        <img src="./images/bird.png" alt="Image" class="icon">
+                        Bird
+                    </button>
+                </li>
+                <li class="sidebar-item">
+                    <button class="sidebar-button" data-action="action4">
+                        <img src="./images/bird.png" alt="Image" class="icon">
+                        Bird
+                    </button>
+                </li>
+                <li class="sidebar-item">
+                    <button class="sidebar-button" data-action="action5">
+                        <img src="./images/bird.png" alt="Image" class="icon">
+                        Bird
+                    </button>
+                </li>
+                <li class="sidebar-item">
+                    <button class="sidebar-button" data-action="action6">
                         <img src="./images/bird.png" alt="Image" class="icon">
                         Bird
                     </button>
@@ -47,6 +68,42 @@
             const sidebar = document.querySelector('.sidebar');
             sidebar.classList.toggle('open');
         }
+
+        // Navigation button functionality
+        const itemsPerPage = 3;
+        let currentPage = 0;
+
+        const itemList = document.getElementById('item-list');
+        const items = Array.from(itemList.getElementsByClassName('sidebar-item'));
+        const prevButton = document.getElementById('prev-button');
+        const nextButton = document.getElementById('next-button');
+
+        function updateVisibleItems() {
+            items.forEach((item, index) => {
+                if (index >= currentPage * itemsPerPage && index < (currentPage + 1) * itemsPerPage) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+        }
+
+        prevButton.addEventListener('click', () => {
+            if (currentPage > 0) {
+                currentPage--;
+                updateVisibleItems();
+            }
+        });
+
+        nextButton.addEventListener('click', () => {
+            if ((currentPage + 1) * itemsPerPage < items.length) {
+                currentPage++;
+                updateVisibleItems();
+            }
+        });
+
+        // Initialize visibility
+        updateVisibleItems();
     </script>
 </body>
 </html>

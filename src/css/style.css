@@ -61,6 +61,16 @@ body, html {
     font-size: 1.5rem;
 }
 
+.nav-button
+{
+    background-color: transparent; /* Remove default button background color */
+    color: inherit; /* Inherit text color from parent li */
+    border: none; /* Remove default button border */
+    cursor: pointer; /* Change cursor to pointer */
+    font-size: 1.5rem;
+    width: 45%;
+}
+
 .sidebar ul li:hover {
     background-color: #4a5568;
 }
@@ -94,4 +104,8 @@ body, html {
 label {
     color: white;
     font-size: 2rem;
+}
+
+.hidden {
+    display: none;
 }
