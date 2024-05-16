@@ -5,6 +5,14 @@ body {
     font-family: 'Monsterrat', 'sans-serif';
 }
 
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+}
+
 /* Add image icon styles */
 .icon {
     display: inline-block;
@@ -13,7 +21,7 @@ body {
     height: 220px; /* Set the height of the image */
     margin-right: 5px; /* Adjust spacing between image and text */
     vertical-align: middle; /* Align the image vertically with the text */
-    padding-bottom: 20px;
+    padding-bottom: 10px;
 }
 
 .sidebar {
@@ -29,7 +37,6 @@ body {
 
 .sidebar h2 {
     font-size: 1.5rem;
-    margin-bottom: 20px;
 }
 
 .sidebar ul {
@@ -40,7 +47,6 @@ body {
 .sidebar ul li {
     padding: 10px;
     cursor: pointer;
-    margin-bottom: 20px;
 }
 
 /* Adjust button styles to match li styles */

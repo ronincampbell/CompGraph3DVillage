@@ -6,13 +6,12 @@ import { MouseControl, MouseSelectedObj } from "./components/utils/mouseControl"
 import { ColorSetter } from "./components/utils/colorSetter";
 import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
-import { DrawLineFromPathNode } from "./components/utils/drawLine";
 import { PathSpawner } from "./components/path/pathSpawner";
 import { Animator } from "./components/utils/animator";
 import { Move } from "./components/utils/animalmovement";
 
-import toonShaderFrag from "./shaders/toonShaderFrag.glsl?raw"
-import toonShaderVert from "./shaders/toonShaderVert.glsl?raw"
+import { Water } from "./components/environment/water";
+import { Bird } from "./components/environment/bird";
 
 
 // Create scene and background
@@ -210,7 +209,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/YellowHouseTex.png",
     scale: 0.04,
     light: "",
-    offset: new THREE.Vector3(0, 0, 0),
+    offset: new THREE.Vector3(0, 1, 0),
     shadows: true,
   },
   houseGreen: {
@@ -219,7 +218,7 @@ const building = {
     tex: "../assets/CustomModels/Textures/GreenHouseTex.png",
     scale: 0.04,
     light: "",
-    offset: new THREE.Vector3(0, 0, 0),
+    offset: new THREE.Vector3(0, 1, 0),
     shadows: true,
   },
   path: {
@@ -239,10 +238,6 @@ const building = {
     light: "",
     offset: new THREE.Vector3(49, 0, 0),
     shadows: false,
-    shaderMaterial: new THREE.ShaderMaterial({
-      vertexShader: toonShaderFrag,
-      fragmentShader: toonShaderVert
-    })
   },
   tree: {
     name: "tree",
@@ -255,30 +250,14 @@ const building = {
   },
 };
 
-const animatedmodel = 
-{
-  bird: {
-    name: "tree",
-    model: "../assets/bird/bird.fbx",
-    tex: "../assets/bird/tex.jpeg",
-    scale: 1,
-    light: "",
-    offset: new THREE.Vector3(0, 30, 0),
-    shadows: true,
-    speed: 0.3,
-  },
-}
+
 
 ////////////////// WATER SHADER //////////////////////
+// const water = new Water();
+// water.AddWater(scene)
 
-
-
-let spawnanimatedmodels = [];
-
-for (var i = 0; i < 5; i++)
-{
-  await FbxLoader(animatedmodel.bird, scene, loadingManager, Math.random() * 100 - 30, Math.random() * 30, Math.random() * 100 - 30, spawnanimatedmodels);
-}
+const bird = new Bird(5);
+bird.AddAllBirds(scene, loadingManager);
 
 const HouseControl = {
   type: 0,
@@ -328,14 +307,10 @@ const actions = {
     createHouse.add();
   },
   action2: () => {
-      // Define action for Item 2 button
-      console.log('Item 2 button clicked');
-      // Example: Rotate a Three.js object
+      
   },
   action3: () => {
-      // Define action for Item 3 button
-      console.log('Item 3 button clicked');
-      // Example: Scale a Three.js object
+    bird.AddBird(scene, loadingManager);
   }
 };
 
@@ -447,9 +422,6 @@ controls.enableDamping = true;
 
   renderer.setAnimationLoop(async () => {
     controls.update();
-
-    Animator(spawnanimatedmodels)
-    Move(spawnanimatedmodels)
 
     if (dayCycle.enable) {
       HouseLights.forEach(light => light.intensity = 500); // Night time intensity

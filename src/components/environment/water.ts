@@ -5,7 +5,7 @@ import waterShaderVert from "../../shaders/waterShaderVert.glsl?raw"
 
 export class Water
 {
-    water;
+    waters = [];
 
     mirrorShaderVar = {
         waveSpeed: 0.03,
@@ -23,7 +23,7 @@ export class Water
         uColorMultiplier: .1 ,
     }
 
-    AddWater(scene)
+    AddWater(scene, position)
     {
         let geometry = new THREE.PlaneGeometry(10, 10, 512, 512);  
         let customShader = Reflector.ReflectorShader;
@@ -77,16 +77,18 @@ export class Water
         customShader.uniforms.tDudv = {value: dudvMap}
         customShader.uniforms.time = {value: 0}
         
-        this.water = new Reflector(geometry, {
+        let water = new Reflector(geometry, {
             shader: customShader,
             clipBias: 0.003,
             textureWidth: window.innerWidth * window.devicePixelRatio,
             textureHeight: window.innerHeight * window.devicePixelRatio,
             color: new THREE.Color("#889999")
         })
-        this.water.position.y = -2;
-        this.water.rotateX(-Math.PI / 2)
-        scene.add(this.water);
+        water.position.set(position.x, position.y, position.z);
+        water.rotateX(-Math.PI / 2)
+        scene.add(water);
+
+        this.waters.push(water);
     }
 
 }
