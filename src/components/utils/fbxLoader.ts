@@ -1,7 +1,7 @@
 import * as THREE from 'three'
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader"
 
-export async function FbxLoader(building, scene, loadingManager, positionx, positiony, positionz, animatedObjects)
+export async function FbxLoader(building, scene, loadingManager, positionx, positiony, positionz, animatedObjects = null)
 {
     const loader = new FBXLoader(loadingManager);
     let object = await loader.loadAsync(building.model)

@@ -303,8 +303,7 @@ var methods = {
   addTree: async function()
   {
     if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
-      let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
-      await FbxLoader(building.tree, scene, loadingManager, position.x, position.y, position.z);
+      let position = MouseSelectedObj.position;
 
       pathSpawner.SpawnSingleTree(scene, loadingManager, position.x / cellSize, position.z / cellSize);
     }

@@ -62,7 +62,7 @@ export class PathSpawner
 
     async SpawnSingleTree(scene, loadingManager, i, j) : Promise<void> 
     {
-        await this.pathSpawnPoints[i][j].SpawnGrass(scene, loadingManager, this.cellSize);
+        await this.pathSpawnPoints[i][j].SpawnTree(scene, loadingManager, this.cellSize);
     }
 
     async SpawnPath(scene, loadingManager) : Promise<void> 
