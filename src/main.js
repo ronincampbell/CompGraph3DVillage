@@ -12,6 +12,7 @@ import { Move } from "./components/utils/animalmovement";
 
 import { Water } from "./components/environment/water";
 import { Bird } from "./components/environment/bird";
+import { DropDownMenu } from "./components/ui/button";
 
 
 // Create scene and background
@@ -269,13 +270,13 @@ var houseLastType = 0;
 // Spawn House
 let roadCheckPoints = [];
 let roadOffset = -10;
-let cellSize = 10; let width = 7; let height = 7;
+let cellSize = 10; let width = 10; let height = 10;
 
 let pathSpawner = new PathSpawner(width, height, cellSize, building);
 let grid = new Grid(width, height, cellSize);
 
-var createHouse = {
-  add: async function () {
+var methods = {
+  addHouse: async function () {
     if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
       let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
       console.log(position);
@@ -283,14 +284,14 @@ var createHouse = {
       addHouseLight(position.x, position.y, position.z);
 
       roadCheckPoints.push(new THREE.Vector3(position.x, 0, position.z - roadOffset));
-      grid.gridArr[position.x / 10][position.z / 10].DisablePlacing();
+      grid.gridArr[position.x / cellSize][position.z / cellSize].DisablePlacing();
 
       if (roadCheckPoints.length > 1) {
         let i = roadCheckPoints.length - 2;
         let pathNodes = [];
         let pathFinding = new PathFinding(grid);
 
-        pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / 10, roadCheckPoints[i].z / 10, roadCheckPoints[i + 1].x / 10, roadCheckPoints[i + 1].z / 10);
+        pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / cellSize, roadCheckPoints[i].z / cellSize, roadCheckPoints[i + 1].x / cellSize, roadCheckPoints[i + 1].z / cellSize);
 
         // Set spawner to spawn grid
         pathSpawner.SetSpawnPointFromPathNodes(pathNodes);
@@ -298,32 +299,28 @@ var createHouse = {
         await pathSpawner.SpawnPath(scene, loadingManager);
       }
     }
+  },
+
+  addTree: async function()
+  {
+    if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
+      let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
+      await FbxLoader(building.tree, scene, loadingManager, position.x, position.y, position.z);
+
+      pathSpawner.SpawnSingleTree(scene, loadingManager, position.x / cellSize, position.z / cellSize);
+    }
+  },
+
+  addBird: async function() 
+  {
+    await bird.AddBird(scene, loadingManager);
   }
 };
 
-// Define actions for each button click
-const actions = {
-  action1: () => {
-    createHouse.add();
-  },
-  action2: () => {
-      
-  },
-  action3: () => {
-    bird.AddBird(scene, loadingManager);
-  }
-};
-
-// Add event listeners to each button
-const buttons = document.querySelectorAll('.sidebar-button');
-buttons.forEach(button => {
-  button.addEventListener('click', () => {
-      const action = button.dataset.action;
-      if (actions[action]) {
-          actions[action]();
-      }
-  });
-});
+let menu = new DropDownMenu()
+menu.addAction1(methods.addHouse)
+menu.addAction2(methods.addTree)
+menu.addAction3(methods.addBird)
 
 // ###### FIREFLIES SHADER ######
 const ffGeometry = new THREE.BufferGeometry();
@@ -408,7 +405,6 @@ dayFolder.add(dayCycle, "enable").onChange(() => {
 
 const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3);
-houseFolder.add(createHouse, 'add');
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
