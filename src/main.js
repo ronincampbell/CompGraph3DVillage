@@ -3,12 +3,10 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GUI } from "dat.gui";
 import { FbxLoader } from "./components/utils/fbxLoader";
 import { MouseControl, MouseSelectedObj } from "./components/utils/mouseControl";
-import { ColorSetter } from "./components/utils/colorSetter";
+import { SetColorOnSelected } from "./components/utils/colorSetter";
 import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
 import { PathSpawner } from "./components/path/pathSpawner";
-import { Animator } from "./components/utils/animator";
-import { Move } from "./components/utils/animalmovement";
 
 import { Water } from "./components/environment/water";
 import { Bird } from "./components/environment/bird";
@@ -278,8 +276,9 @@ let grid = new Grid(width, height, cellSize);
 var methods = {
   addHouse: async function () {
     if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
-      let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
-      console.log(position);
+      // let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
+      let position = MouseSelectedObj.position;
+
       await FbxLoader(building.houseBlue, scene, loadingManager, position.x, position.y, position.z);
       addHouseLight(position.x, position.y, position.z);
 
@@ -456,10 +455,6 @@ controls.enableDamping = true;
 
       houseLastType = Math.round(HouseControl.type);
 
-    }
-
-    if (MouseSelectedObj != null) {
-      ColorSetter(MouseSelectedObj.parent, new THREE.Color("Red"));
     }
 
     renderer.render(scene, camera);

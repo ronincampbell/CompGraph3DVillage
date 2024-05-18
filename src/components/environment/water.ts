@@ -85,7 +85,7 @@ export class Water
             color: new THREE.Color("#889999")
         })
         water.position.set(position.x, position.y, position.z);
-        water.rotateX(-Math.PI / 2)
+        water.rotateX(-Math.PI / 2);
         scene.add(water);
 
         this.waters.push(water);

@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import {SetColorOnSelected} from './colorSetter.ts'
 
 export var MouseSelectedObj = null;
 var lastColor = [];
@@ -35,7 +36,7 @@ export function MouseControl(document, renderer, camera, scene) {
                     MouseSelectedObj.material[i].color = new THREE.Color("Black")
                 }
                 
-                
+                SetColorOnSelected(MouseSelectedObj, new THREE.Color("Red"));
             }
         }
     }

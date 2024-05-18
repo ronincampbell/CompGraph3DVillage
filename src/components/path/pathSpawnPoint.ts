@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { PathNode } from '../pathfinding/pathNode';
 import { FbxLoader } from '../utils/fbxLoader';
+import { Plane } from '../utils/primitiveMesh';
 
 export class PathSpawnPoint 
 {
@@ -44,12 +45,16 @@ export class PathSpawnPoint
         if (this.top || this.bottom || this.left || this.right) return; 
         if (this.spawnObj != null) scene.remove(this.spawnObj);
         
-        const randomNum = Math.random();
-        if (randomNum < 1/6) {
-            this.spawnObj = await FbxLoader(this.building.tree, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
-        } else {
-            this.spawnObj = await FbxLoader(this.building.grass, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
-        }
+        // const randomNum = Math.random();
+        // if (randomNum < 1/6) {
+        //     this.spawnObj = await FbxLoader(this.building.tree, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
+        // } else {
+        //     this.spawnObj = await FbxLoader(this.building.grass, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
+        // }
+        
+        this.spawnObj = Plane(cellSize, cellSize, this.x * cellSize, 0, this.y * cellSize)
+
+        scene.add( this.spawnObj );
     }
 
     async SpawnTree(scene, loadingManager, cellSize): Promise<void> 
