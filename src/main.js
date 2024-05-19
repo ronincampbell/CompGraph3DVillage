@@ -172,6 +172,11 @@ const progressBar = document.getElementById('progress-bar');
 const progressBarContainer = document.querySelector('.progress-bar-container');
 const loadingManager = new THREE.LoadingManager();
 
+loadingManager.onStart = function(url, loaded, total)
+{
+  progressBarContainer.style.display = 'flex';
+}
+
 loadingManager.onProgress = function(url, loaded, total) 
 {
   progressBar.value = (loaded/total) * 100;
@@ -255,9 +260,6 @@ const building = {
 // const water = new Water();
 // water.AddWater(scene)
 
-const bird = new Bird(5);
-bird.AddAllBirds(scene, loadingManager);
-
 const GridControl = 
 {
   cellSize: 10,
@@ -277,9 +279,13 @@ const HouseControl = {
   number: 0,
 };
 
+const bird = new Bird();
 const BirdControl = 
 {
-
+  isMoving: false,
+  number: 0,
+  animationSpeed: 0.5,
+  flySpeed: 0.5,
 }
 // Change house type when this one changes
 var houseLastType = 0;
@@ -315,7 +321,7 @@ var methods = {
 
   spawnBird: async function() 
   {
-
+    await bird.AddAllBirds(scene, loadingManager, BirdControl.number);
   },
 
   addHouse: async function () {
@@ -460,6 +466,13 @@ const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3);
 houseFolder.add(HouseControl, "number", 0, 10);
 
+const birdFolder = gui.addFolder("Bird");
+birdFolder.add(BirdControl, "isMoving");
+birdFolder.add(BirdControl, "number", 0, 20, 1);
+birdFolder.add(BirdControl, "flySpeed", 0, 1, 0.01);
+birdFolder.add(BirdControl, "animationSpeed", 0, 1);
+birdFolder.add(methods, "spawnBird");
+
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.target.set(0, 0, 0);
@@ -467,7 +480,6 @@ controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
 (async function () {
-  
 
   renderer.setAnimationLoop(async () => {
     controls.update();
@@ -583,7 +595,10 @@ let clock = new THREE.Clock();
 function animate() {
     let deltaTime = clock.getDelta();
     fireflies.material.uniforms.time.value += deltaTime;
-    renderer.render(scene, camera);
+      
+    if (BirdControl.isMoving) bird.Update(BirdControl.flySpeed, BirdControl.animationSpeed);
+    
+      renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
 

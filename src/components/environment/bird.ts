@@ -3,29 +3,28 @@ import * as THREE from 'three'
 
 export class Bird
 {
-    maxNum: number;
-
     bird;
-    spawnedBirds;
+    spawnedBirds = [];
+    maxNum = 0;
 
-    constructor(maxNum)
+    constructor()
     {
-        this.maxNum = maxNum;
         this.bird = {
-            name: "tree",
+            name: "bird",
             model: "../assets/bird/bird.fbx",
             tex: "../assets/bird/tex.jpeg",
             scale: 1,
             light: "",
             offset: new THREE.Vector3(0, 30, 0),
             shadows: true,
-            speed: 0.3,
         };
     }
 
-    async AddAllBirds(scene, loadingManager)
+    async AddAllBirds(scene, loadingManager, maxNum)
     {
-        for (var i = 0; i < this.maxNum; i++)
+        this.RemoveAllBirds(scene);
+        this.maxNum = maxNum;
+        for (var i = 0; i < maxNum; i++)
         {
             await this.AddBird(scene, loadingManager);
         }
@@ -38,14 +37,18 @@ export class Bird
 
     RemoveAllBirds(scene)
     {
+        if (this.maxNum <= 0) return;
         for (const bird of this.spawnedBirds) {
             scene.remove(bird.object)
         }
         this.spawnedBirds = []
+        this.maxNum = 0;
     }
 
     Update(moveSpeed, animationSpeed)
     {
+        if (this.maxNum == 0) return;
+
         for (const bird of this.spawnedBirds) {
             bird.object.position.z += moveSpeed;
             if (bird.object.position.z > 200)
