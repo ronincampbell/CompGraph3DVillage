@@ -276,16 +276,20 @@ const HouseControl = {
   color: new THREE.Color(1, 0, 0),
   number: 0,
 };
+
+const BirdControl = 
+{
+
+}
 // Change house type when this one changes
 var houseLastType = 0;
 
 // Spawn House
 let roadCheckPoints = [];
 let roadOffset = -10;
-let cellSize = 10; let width = 10; let height = 10;
 
 let pathSpawner = null;
-let grid = new Grid(width, height, cellSize);
+let grid = null;
 
 var methods = {
   spawnGrid: async function() 
@@ -296,6 +300,7 @@ var methods = {
     }
 
     pathSpawner = new PathSpawner(GridControl.width, GridControl.length, GridControl.cellSize, building);
+    grid = new Grid(GridControl.width, GridControl.length, GridControl.cellSize);
     await pathSpawner.SpawnGrass(scene, loadingManager);
   },
 
@@ -308,23 +313,28 @@ var methods = {
     await pathSpawner.SpawnTree(scene, loadingManager, TreeControl.maxNum, TreeControl.percent);
   },
 
+  spawnBird: async function() 
+  {
+
+  },
+
   addHouse: async function () {
     if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
       // let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
       let position = MouseSelectedObj.position;
 
-      pathSpawner.SpawnSingleHouse(scene, loadingManager, position.x / cellSize, position.z / cellSize);
+      pathSpawner.SpawnSingleHouse(scene, loadingManager, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
       addHouseLight(position.x, position.y, position.z);
 
       roadCheckPoints.push(new THREE.Vector3(position.x, 0, position.z - roadOffset));
-      grid.gridArr[position.x / cellSize][position.z / cellSize].DisablePlacing();
+      grid.gridArr[position.x / GridControl.cellSize][position.z / GridControl.cellSize].DisablePlacing();
 
       if (roadCheckPoints.length > 1) {
         let i = roadCheckPoints.length - 2;
         let pathNodes = [];
         let pathFinding = new PathFinding(grid);
 
-        pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / cellSize, roadCheckPoints[i].z / cellSize, roadCheckPoints[i + 1].x / cellSize, roadCheckPoints[i + 1].z / cellSize);
+        pathNodes = pathFinding.FindPath(roadCheckPoints[i].x / GridControl.cellSize, roadCheckPoints[i].z / GridControl.cellSize, roadCheckPoints[i + 1].x / GridControl.cellSize, roadCheckPoints[i + 1].z / GridControl.cellSize);
 
         // Set spawner to spawn grid
         pathSpawner.SetSpawnPointFromPathNodes(pathNodes);

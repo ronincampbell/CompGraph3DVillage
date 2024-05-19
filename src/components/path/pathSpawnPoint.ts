@@ -51,9 +51,16 @@ export class PathSpawnPoint
         
     }
 
+    CanSpawn(): boolean 
+    {
+        return this.spawnObjName != "House" && this.spawnObjName != "Path";
+    }
+
     async SpawnTree(scene, loadingManager, cellSize): Promise<void> 
     {
         if (this.top || this.bottom || this.left || this.right) return; 
+        if (!this.CanSpawn()) return;
+
         if (this.spawnObj != null) scene.remove(this.spawnObj);
         
         this.spawnObjName = "Tree";
