@@ -54,7 +54,6 @@ export class PathSpawnPoint
             scene.add( this.spawnObj );
         }
         
-        
     }
 
     async SpawnTree(scene, loadingManager, cellSize): Promise<void> 
@@ -80,5 +79,10 @@ export class PathSpawnPoint
             if (this.spawnObj != null) scene.remove(this.spawnObj);
             this.spawnObj = await FbxLoader(this.building.path, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
         }
+    }
+
+    async Clear(scene) : Promise<void> 
+    {
+        if (this.spawnObj != null) scene.remove(this.spawnObj);
     }
 }

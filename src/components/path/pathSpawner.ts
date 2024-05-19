@@ -15,7 +15,6 @@ export class PathSpawner
         this.building = building;
 
         let point = new PathSpawnPoint(0, 0, building);
-
         this.pathSpawnPoints = Array(width).fill(point).map(x => Array(height).fill(point));
 
         for (var i = 0; i < width; i++)
@@ -47,6 +46,17 @@ export class PathSpawner
 
         this.pathSpawnPoints[pathNode.x][pathNode.y].SetCameFrom(pathNode.cameFrom);
         this.pathSpawnPoints[cameFrom.x][cameFrom.y].SetCameFrom(pathNode);
+    }
+
+    Clear(scene): void 
+    {
+        for (var i = 0; i < this.width; i++)
+        {
+            for (var j = 0; j < this.height; j++)
+            {
+                this.pathSpawnPoints[i][j].Clear(scene);
+            }
+        }
     }
 
     async SpawnGrass(scene, loadingManager) : Promise<void> 

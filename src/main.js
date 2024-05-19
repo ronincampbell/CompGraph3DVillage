@@ -258,9 +258,17 @@ const building = {
 const bird = new Bird(5);
 bird.AddAllBirds(scene, loadingManager);
 
+const GridControl = 
+{
+  cellSize: 10,
+  width: 10,
+  height: 10,
+}
+
 const HouseControl = {
   type: 0,
   color: new THREE.Color(1, 0, 0),
+  number: 0,
 };
 // Change house type when this one changes
 var houseLastType = 0;
@@ -270,10 +278,20 @@ let roadCheckPoints = [];
 let roadOffset = -10;
 let cellSize = 10; let width = 10; let height = 10;
 
-let pathSpawner = new PathSpawner(width, height, cellSize, building);
+let pathSpawner = null;
 let grid = new Grid(width, height, cellSize);
 
 var methods = {
+  addGrid: async function() 
+  {
+    if (pathSpawner != null)
+    {
+      pathSpawner.Clear(scene);
+    }
+    pathSpawner = new PathSpawner(GridControl.width, GridControl.height, GridControl.cellSize, building);
+    await pathSpawner.SpawnGrass(scene, loadingManager);
+  },
+
   addHouse: async function () {
     if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
       // let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
@@ -401,8 +419,15 @@ dayFolder.add(dayCycle, "enable").onChange(() => {
   }
 });
 
+const gridFolder = gui.addFolder("Grid");
+gridFolder.add(GridControl, "cellSize", 10, 100, 10);
+gridFolder.add(GridControl, "width", 1, 20, 1);
+gridFolder.add(GridControl, "height", 1, 20, 1);
+gridFolder.add(methods, "addGrid");
+
 const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3);
+houseFolder.add(HouseControl, "number", 0, 10);
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -411,8 +436,7 @@ controls.dampingFactor = 0.05;
 controls.enableDamping = true;
 
 (async function () {
-  // Spawn grass
-  await pathSpawner.SpawnGrass(scene, loadingManager);
+  
 
   renderer.setAnimationLoop(async () => {
     controls.update();
