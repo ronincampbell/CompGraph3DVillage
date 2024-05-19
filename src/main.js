@@ -262,7 +262,13 @@ const GridControl =
 {
   cellSize: 10,
   width: 10,
-  height: 10,
+  length: 10,
+}
+
+const TreeControl = 
+{
+  maxNum: 10,
+  percent: 1,
 }
 
 const HouseControl = {
@@ -282,14 +288,24 @@ let pathSpawner = null;
 let grid = new Grid(width, height, cellSize);
 
 var methods = {
-  addGrid: async function() 
+  spawnGrid: async function() 
   {
     if (pathSpawner != null)
     {
       pathSpawner.Clear(scene);
     }
-    pathSpawner = new PathSpawner(GridControl.width, GridControl.height, GridControl.cellSize, building);
+
+    pathSpawner = new PathSpawner(GridControl.width, GridControl.length, GridControl.cellSize, building);
     await pathSpawner.SpawnGrass(scene, loadingManager);
+  },
+
+  spawnTree: async function()
+  {
+    if (pathSpawner == null) return;
+
+    pathSpawner.ClearWithName(scene, "Tree");
+    await pathSpawner.SpawnGrass(scene, loadingManager);
+    await pathSpawner.SpawnTree(scene, loadingManager, TreeControl.maxNum, TreeControl.percent);
   },
 
   addHouse: async function () {
@@ -422,8 +438,13 @@ dayFolder.add(dayCycle, "enable").onChange(() => {
 const gridFolder = gui.addFolder("Grid");
 gridFolder.add(GridControl, "cellSize", 10, 100, 10);
 gridFolder.add(GridControl, "width", 1, 20, 1);
-gridFolder.add(GridControl, "height", 1, 20, 1);
-gridFolder.add(methods, "addGrid");
+gridFolder.add(GridControl, "length", 1, 20, 1);
+gridFolder.add(methods, "spawnGrid");
+
+const treeFolder = gui.addFolder("Tree");
+treeFolder.add(TreeControl, "maxNum", 0, 100);
+treeFolder.add(TreeControl, "percent", 0, 1);
+treeFolder.add(methods, "spawnTree");
 
 const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3);

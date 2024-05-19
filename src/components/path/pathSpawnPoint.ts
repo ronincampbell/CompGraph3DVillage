@@ -9,7 +9,7 @@ export class PathSpawnPoint
     left: boolean = false; right: boolean = false; 
     top: boolean = false; bottom: boolean = false;
     building: any;
-    spawnObj: any;
+    spawnObj: any; spawnObjName: string;
 
     constructor(x, y, building)
     {
@@ -43,16 +43,11 @@ export class PathSpawnPoint
     async SpawnGrass(scene, loadingManager, cellSize): Promise<void> 
     {
         if (this.top || this.bottom || this.left || this.right) return; 
-        if (this.spawnObj != null) scene.remove(this.spawnObj);
+        if (this.spawnObj != null) return;
         
-        const randomNum = Math.random();
-        if (randomNum < 1/6) {
-            this.spawnObj = await FbxLoader(this.building.tree, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
-        } else {
-            this.spawnObj = Plane(cellSize, cellSize, this.x * cellSize, 0, this.y * cellSize)
-
-            scene.add( this.spawnObj );
-        }
+        this.spawnObj = Plane(cellSize, cellSize, this.x * cellSize, 0, this.y * cellSize)
+        this.spawnObjName = "Grass";
+        scene.add( this.spawnObj );
         
     }
 
@@ -61,6 +56,7 @@ export class PathSpawnPoint
         if (this.top || this.bottom || this.left || this.right) return; 
         if (this.spawnObj != null) scene.remove(this.spawnObj);
         
+        this.spawnObjName = "Tree";
         this.spawnObj = await FbxLoader(this.building.tree, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
     }
 
@@ -69,6 +65,7 @@ export class PathSpawnPoint
         if (this.top || this.bottom || this.left || this.right) return; 
         if (this.spawnObj != null) scene.remove(this.spawnObj);
         
+        this.spawnObjName = "House";
         this.spawnObj = await FbxLoader(this.building.houseBlue, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
     }
 
@@ -77,12 +74,32 @@ export class PathSpawnPoint
         if (this.top || this.bottom || this.left || this.right)
         {
             if (this.spawnObj != null) scene.remove(this.spawnObj);
+
+            this.spawnObjName = "Path";
             this.spawnObj = await FbxLoader(this.building.path, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
         }
     }
 
-    async Clear(scene) : Promise<void> 
+    Clear(scene) : void
     {
         if (this.spawnObj != null) scene.remove(this.spawnObj);
+    }
+
+    ClearWithName(scene, name) : void 
+    {
+        if (this.spawnObj != null && this.spawnObjName == name)
+        {
+            scene.remove(this.spawnObj);
+            this.spawnObj = null;
+        }
+    }
+
+    ClearObject(scene) : void 
+    {
+        if (this.spawnObj != null && this.spawnObjName != "Grass")
+        {
+            scene.remove(this.spawnObj);
+            this.spawnObj = null;
+        }
     }
 }

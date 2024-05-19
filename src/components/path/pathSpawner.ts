@@ -59,6 +59,28 @@ export class PathSpawner
         }
     }
 
+    ClearWithName(scene, name): void 
+    {
+        for (var i = 0; i < this.width; i++)
+        {
+            for (var j = 0; j < this.height; j++)
+            {
+                this.pathSpawnPoints[i][j].ClearWithName(scene, name);
+            }
+        }
+    }
+
+    ClearObject(scene): void 
+    {
+        for (var i = 0; i < this.width; i++)
+        {
+            for (var j = 0; j < this.height; j++)
+            {
+                this.pathSpawnPoints[i][j].ClearObject(scene);
+            }
+        }
+    }
+
     async SpawnGrass(scene, loadingManager) : Promise<void> 
     {
         for (var i = 0; i < this.width; i++)
@@ -66,6 +88,23 @@ export class PathSpawner
             for (var j = 0; j < this.height; j++)
             {
                 await this.pathSpawnPoints[i][j].SpawnGrass(scene, loadingManager, this.cellSize);
+            }
+        }
+    }
+
+    async SpawnTree(scene, loadingManager, maxNum, randomNum) : Promise<void>
+    {
+        for (var i = 0; i < this.width; i++)
+        {
+            for (var j = 0; j < this.height; j++)
+            {
+                if (Math.random() < randomNum)
+                {
+                    await this.pathSpawnPoints[i][j].SpawnTree(scene, loadingManager, this.cellSize);
+                    maxNum--;
+                }
+
+                if (maxNum <= 0) return;
             }
         }
     }
