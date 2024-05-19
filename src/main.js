@@ -279,7 +279,7 @@ var methods = {
       // let position = MouseSelectedObj.parent.position.clone().sub(building.grass.offset);
       let position = MouseSelectedObj.position;
 
-      await FbxLoader(building.houseBlue, scene, loadingManager, position.x, position.y, position.z);
+      pathSpawner.SpawnSingleHouse(scene, loadingManager, position.x / cellSize, position.z / cellSize);
       addHouseLight(position.x, position.y, position.z);
 
       roadCheckPoints.push(new THREE.Vector3(position.x, 0, position.z - roadOffset));
