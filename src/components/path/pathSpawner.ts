@@ -119,6 +119,11 @@ export class PathSpawner
         await this.pathSpawnPoints[i][j].SpawnHouse(scene, loadingManager, this.cellSize);
     }
 
+    SpawnSingleWater(scene, water, i, j) : void 
+    {
+        this.pathSpawnPoints[i][j].SpawnWater(scene, water, this.cellSize);
+    }
+
     async SpawnPath(scene, loadingManager) : Promise<void> 
     {
         for (var i = 0; i < this.width; i++)

@@ -23,7 +23,14 @@ export class Water
         uColorMultiplier: .1 ,
     }
 
-    AddWater(scene, position)
+    constructor(mirrorShaderVar, waveShaderVar)
+    {
+        this.mirrorShaderVar = mirrorShaderVar;
+        this.waveShaderVar = waveShaderVar;
+        this.waters = []
+    }
+
+    AddWater(scene, posx, posy, posz)
     {
         let geometry = new THREE.PlaneGeometry(10, 10, 512, 512);  
         let customShader = Reflector.ReflectorShader;
@@ -72,7 +79,7 @@ export class Water
             fragmentShader: waterShaderFrag,
         };
 
-        const dudvMap = new THREE.TextureLoader().load('../assets/water/waterdudv.jpg');
+        const dudvMap = new THREE.TextureLoader().load('../../../assets/water/waterdudv.jpg');
         dudvMap.wrapS = dudvMap.wrapT = THREE.RepeatWrapping;
         customShader.uniforms.tDudv = {value: dudvMap}
         customShader.uniforms.time = {value: 0}
@@ -84,11 +91,43 @@ export class Water
             textureHeight: window.innerHeight * window.devicePixelRatio,
             color: new THREE.Color("#889999")
         })
-        water.position.set(position.x, position.y, position.z);
+        
+        water.position.set(posx, posy, posz);
         water.rotateX(-Math.PI / 2);
+        this.waters.push(water);
+        
+        
         scene.add(water);
 
-        this.waters.push(water);
+        return water;
+    }
+
+    Update(clock) 
+    {
+        // this.UpdateMirrorShader();
+        // this.UpdateWaveShader(clock);
+    }
+
+    UpdateMirrorShader() 
+    {
+        for (const water of this.waters)
+        {
+            water.material.uniforms.time.value += 0.1;
+            water.material.uniforms.waveSpeed.value = this.mirrorShaderVar.waveSpeed;
+            water.material.uniforms.waveStrength.value = this.mirrorShaderVar.waveStrength;
+            water.material.uniforms.color.value = new THREE.Color(this.mirrorShaderVar.color);
+        }
+    }
+      
+    UpdateWaveShader(clock) 
+    {
+        for (const water of this.waters)
+        {
+            water.material.uniforms.uTime.value = clock.getElapsedTime();
+            water.material.uniforms.uBigWavesElevation.value = this.waveShaderVar.uBigWavesElevation;
+            water.material.uniforms.uBigWavesSpeed.value = this.waveShaderVar.uBigWavesSpeed;
+            water.material.uniforms.uBigWavesFrequency.value = this.waveShaderVar.uBigWavesFrequency;
+        }
     }
 
 }

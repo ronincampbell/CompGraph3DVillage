@@ -257,8 +257,27 @@ const building = {
 
 
 ////////////////// WATER SHADER //////////////////////
-// const water = new Water();
-// water.AddWater(scene)
+
+
+const WaterControl = 
+{
+  mirrorShaderVar: {
+    waveSpeed: 0.03,
+    waveStrength: 0.5,
+    color: "#000000"
+  },
+  waveShaderVar: {
+    uBigWavesElevation: .60,
+    uBigWavesFrequency: new THREE.Vector2(.2, .2),
+    uBigWavesSpeed: 0.75,
+    uDepthColor: '#889999',
+    uSurfaceColor: '#9bd8ff',
+    uColorOffset: 0.08,
+    uColorMultiplier: .1 ,
+  }
+}
+
+const water = new Water(WaterControl.mirrorShaderVar, WaterControl. waveShaderVar);
 
 const GridControl = 
 {
@@ -355,13 +374,24 @@ var methods = {
     if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
       let position = MouseSelectedObj.position;
 
-      pathSpawner.SpawnSingleTree(scene, loadingManager, position.x / cellSize, position.z / cellSize);
+      pathSpawner.SpawnSingleTree(scene, loadingManager, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
     }
   },
 
   addBird: async function() 
   {
     await bird.AddBird(scene, loadingManager);
+  },
+
+  addWater: function()
+  {
+    if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
+      let position = MouseSelectedObj.position;
+
+      pathSpawner.SpawnSingleWater(scene, water, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
+
+      grid.gridArr[position.x / GridControl.cellSize][position.z / GridControl.cellSize].DisablePlacing();
+    }
   }
 };
 
@@ -472,6 +502,9 @@ birdFolder.add(BirdControl, "number", 0, 20, 1);
 birdFolder.add(BirdControl, "flySpeed", 0, 1, 0.01);
 birdFolder.add(BirdControl, "animationSpeed", 0, 1);
 birdFolder.add(methods, "spawnBird");
+
+const waterFolder = gui.addFolder("Water");
+waterFolder.add(methods, "addWater")
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -597,8 +630,9 @@ function animate() {
     fireflies.material.uniforms.time.value += deltaTime;
       
     if (BirdControl.isMoving) bird.Update(BirdControl.flySpeed, BirdControl.animationSpeed);
+    water.Update(clock);
     
-      renderer.render(scene, camera);
+    renderer.render(scene, camera);
     requestAnimationFrame(animate);
 }
 
