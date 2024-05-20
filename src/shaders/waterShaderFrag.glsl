@@ -1,31 +1,54 @@
-uniform vec3 color;
-uniform sampler2D tDiffuse;
+#include <common>
+#include <packing>
+#include <fog_pars_fragment>
+
+varying vec2 vUv;
+uniform sampler2D tDepth;
 uniform sampler2D tDudv;
+uniform vec3 waterColor;
+uniform vec3 foamColor;
+uniform float cameraNear;
+uniform float cameraFar;
 uniform float time;
-uniform float waveStrength;
-uniform float waveSpeed;
-varying vec4 vUv;
+uniform float threshold;
+uniform vec2 resolution;
 
-#include <logdepthbuf_pars_fragment>
+float getDepth( const in vec2 screenPosition ) {
+    #if DEPTH_PACKING == 1
+        return unpackRGBAToDepth( texture2D( tDepth, screenPosition ) );
+    #else
+        return texture2D( tDepth, screenPosition ).x;
+    #endif
+}
 
-void main() 
-{
-    #include <logdepthbuf_fragment>
+float getViewZ( const in float depth ) {
+    #if ORTHOGRAPHIC_CAMERA == 1
+        return orthographicDepthToViewZ( depth, cameraNear, cameraFar );
+    #else
+        return perspectiveDepthToViewZ( depth, cameraNear, cameraFar );
+    #endif
+}
 
-    // simple distortion
-    // horizontal distortion
-    vec2 distortedUv = texture2D(tDudv, vec2(vUv.x * time * waveSpeed, vUv.y)).rb * waveStrength;
-    // vertical distortion
-    distortedUv = vUv.xy * vec2(distortedUv.x, distortedUv.y * time * waveSpeed);
-    vec2 distortion = (texture2D(tDudv, distortedUv).rb *2.0 - 1.0) * waveStrength;
+const float strength = 1.0;
 
-    // new uv coords
-    vec4 uv = vec4(vUv);
-    uv.xy += distortion;
+void main() {
 
-    // merge color
-    vec4 base = texture2DProj(tDiffuse, uv);
-    gl_FragColor = vec4(mix(base.rgb, color, 0.3), 1.0);
+    vec2 screenUV = gl_FragCoord.xy / resolution;
+
+    float fragmentLinearEyeDepth = getViewZ( gl_FragCoord.z );
+    float linearEyeDepth = getViewZ( getDepth( screenUV ) );
+
+    float diff = saturate( fragmentLinearEyeDepth - linearEyeDepth );
+
+    vec2 displacement = texture2D( tDudv, ( vUv * 2.0 ) - time * 0.05 ).rg;
+    displacement = ( ( displacement * 2.0 ) - 1.0 ) * strength;
+    diff += displacement.x;
+
+    gl_FragColor.rgb = mix( foamColor, waterColor, step( threshold, diff ) );
+    gl_FragColor.a = 1.0;
+
     #include <tonemapping_fragment>
     #include <encodings_fragment>
+    #include <fog_fragment>
+
 }

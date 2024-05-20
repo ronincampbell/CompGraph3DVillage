@@ -1,133 +1,134 @@
 import * as THREE from 'three'
-import { Reflector } from 'three/examples/jsm/objects/Reflector'
-import waterShaderFrag from "../../shaders/waterShaderFrag.glsl?raw"
-import waterShaderVert from "../../shaders/waterShaderVert.glsl?raw"
+import waterVertexShader from '../../shaders/waterShaderVert.glsl?raw'
+import waterFragmentShader from '../../shaders/waterShaderFrag.glsl?raw'
 
-export class Water
+export class WaterControl
 {
-    waters = [];
+    water = null; 
+    noiseMap; dudvMap;
 
-    mirrorShaderVar = {
-        waveSpeed: 0.03,
-        waveStrength: 0.5,
-        color: "#000000"
-    }
-
-    waveShaderVar = {
-        uBigWavesElevation: .60,
-        uBigWavesFrequency: new THREE.Vector2(.2, .2),
-        uBigWavesSpeed: 0.75,
-        uDepthColor: '#889999',
-        uSurfaceColor: '#9bd8ff',
-        uColorOffset: 0.08,
-        uColorMultiplier: .1 ,
-    }
-
-    constructor(mirrorShaderVar, waveShaderVar)
-    {
-        this.mirrorShaderVar = mirrorShaderVar;
-        this.waveShaderVar = waveShaderVar;
-        this.waters = []
-    }
-
-    AddWater(scene, posx, posy, posz)
-    {
-        let geometry = new THREE.PlaneGeometry(10, 10, 512, 512);  
-        let customShader = Reflector.ReflectorShader;
-        
-        customShader = {
-
-            name: 'ReflectorShader',
-        
-            uniforms: {
-        
-            'color': {
-                value: this.mirrorShaderVar.color
-            },
-        
-            'tDiffuse': {
-                value: null
-            },
-        
-            'textureMatrix': {
-                value: null
-            },
-            
-            'waveSpeed': {
-                value: this.mirrorShaderVar.waveSpeed
-            },
-
-            'waveStrength' : {
-                value: this.mirrorShaderVar.waveStrength
-            },
-            uTime: { value: 0 },
-            uBigWavesElevation: { value: .60 },
-            uBigWavesFrequency: { value: new THREE.Vector2(.2, .6)},
-            uBigWavesSpeed: { value: 0.75 },
-            uDepthColor: { value: new THREE.Color("#889999")},
-            uSurfaceColor: { value: new THREE.Color("#9bd8ff")},
-            uColorOffset: { value: 0.08 },
-            uColorMultiplier: { value: .1 },
-
-            uSmallWavesElevation: { value: 0.1 },
-            uSmallWavesFrequency: { value: .2},
-            uSmallWavesSpeed: { value: 0.2 },
-            uSmallWavesIterations: { value: 2.0 },
-            },
-        
-            vertexShader: waterShaderVert,
-            fragmentShader: waterShaderFrag,
-        };
-
-        const dudvMap = new THREE.TextureLoader().load('../../../assets/water/waterdudv.jpg');
-        dudvMap.wrapS = dudvMap.wrapT = THREE.RepeatWrapping;
-        customShader.uniforms.tDudv = {value: dudvMap}
-        customShader.uniforms.time = {value: 0}
-        
-        let water = new Reflector(geometry, {
-            shader: customShader,
-            clipBias: 0.003,
-            textureWidth: window.innerWidth * window.devicePixelRatio,
-            textureHeight: window.innerHeight * window.devicePixelRatio,
-            color: new THREE.Color("#889999")
-        })
-        
-        water.position.set(posx, posy, posz);
-        water.rotateX(-Math.PI / 2);
-        this.waters.push(water);
-        
-        
-        scene.add(water);
-
-        return water;
-    }
-
-    Update(clock) 
-    {
-        // this.UpdateMirrorShader();
-        // this.UpdateWaveShader(clock);
-    }
-
-    UpdateMirrorShader() 
-    {
-        for (const water of this.waters)
-        {
-            water.material.uniforms.time.value += 0.1;
-            water.material.uniforms.waveSpeed.value = this.mirrorShaderVar.waveSpeed;
-            water.material.uniforms.waveStrength.value = this.mirrorShaderVar.waveStrength;
-            water.material.uniforms.color.value = new THREE.Color(this.mirrorShaderVar.color);
+    waterUniforms = {
+        time: {
+            value: 0
+        },
+        threshold: {
+            value: 0.01
+        },
+        tDudv: {
+            value: null
+        },
+        tDepth: {
+            value: null
+        },
+        cameraNear: {
+            value: 0
+        },
+        cameraFar: {
+            value: 0
+        },
+        resolution: {
+            value: new THREE.Vector2()
+        },
+        foamColor: {
+            value: new THREE.Color(0xffffff)
+        },
+        waterColor: {
+            value: new THREE.Color(0x14c6a5)
         }
-    }
-      
-    UpdateWaveShader(clock) 
+    };
+
+    constructor()
     {
-        for (const water of this.waters)
-        {
-            water.material.uniforms.uTime.value = clock.getElapsedTime();
-            water.material.uniforms.uBigWavesElevation.value = this.waveShaderVar.uBigWavesElevation;
-            water.material.uniforms.uBigWavesSpeed.value = this.waveShaderVar.uBigWavesSpeed;
-            water.material.uniforms.uBigWavesFrequency.value = this.waveShaderVar.uBigWavesFrequency;
-        }
+        var loader = new THREE.TextureLoader();
+        this.noiseMap = loader.load("https://i.imgur.com/gPz7iPX.jpg");
+        this.dudvMap = loader.load("https://i.imgur.com/hOIsXiZ.png");
+        this.noiseMap.wrapS = this.noiseMap.wrapT = THREE.RepeatWrapping;
+        this.noiseMap.minFilter = THREE.NearestFilter;
+        this.noiseMap.magFilter = THREE.NearestFilter;
+        this.dudvMap.wrapS = this.dudvMap.wrapT = THREE.RepeatWrapping;
+    }
+
+    AddWater(scene, camera, renderTarget, pixelRatio, supportsDepthTextureExtension, posx, posy, posz)
+    {
+        // border
+
+        var boxGeometry = new THREE.BoxGeometry(10, 1, 1);
+        var boxMaterial = new THREE.MeshLambertMaterial({ color: 0xea4d10 });
+
+        var box1 = new THREE.Mesh(boxGeometry, boxMaterial); 
+        box1.position.set(posx, posy, posz);
+        box1.position.z += 4.5;
+        scene.add(box1);
+
+        var box2 = new THREE.Mesh(boxGeometry, boxMaterial);
+        box2.position.set(posx, posy, posz);
+        box2.position.z += -4.5;
+        scene.add(box2);
+
+        var box3 = new THREE.Mesh(boxGeometry, boxMaterial);
+        box3.position.set(posx, posy, posz);
+        box3.position.x += -5;
+        box3.rotation.y = Math.PI * 0.5;
+        scene.add(box3);
+
+        var box4 = new THREE.Mesh(boxGeometry, boxMaterial);
+        box4.position.set(posx, posy, posz);
+        box4.position.x += 5;
+        box4.rotation.y = Math.PI * 0.5;
+        scene.add(box4);
+
+        var waterGeometry = new THREE.PlaneGeometry(10, 10);
+        var waterMaterial = new THREE.ShaderMaterial({
+            defines: {
+                DEPTH_PACKING: supportsDepthTextureExtension === true ? 0 : 1,
+                ORTHOGRAPHIC_CAMERA: 1
+            },
+            uniforms: THREE.UniformsUtils.merge([THREE.UniformsLib["fog"], this.waterUniforms]),
+            vertexShader: waterVertexShader,
+            fragmentShader: waterFragmentShader,
+            fog: true
+        });
+
+        waterMaterial.uniforms.cameraNear.value = camera.near;
+        waterMaterial.uniforms.cameraFar.value = camera.far;
+        waterMaterial.uniforms.resolution.value.set(
+            window.innerWidth * pixelRatio,
+            window.innerHeight * pixelRatio
+        );
+        waterMaterial.uniforms.tDudv.value = this.dudvMap;
+        waterMaterial.uniforms.tDepth.value =
+            supportsDepthTextureExtension === true
+            ? renderTarget.depthTexture
+            : renderTarget.texture;
+
+        this.water = new THREE.Mesh(waterGeometry, waterMaterial);
+        this.water.rotation.x = -Math.PI * 0.5;
+        this.water.position.set(posx, posy, posz);
+
+        scene.add(this.water);
+    }
+
+    animate(scene, camera, renderer, renderTarget, clock, depthMaterial)
+    {
+        if (this.water == null) return;
+
+        // this.water.visible = false; // we don't want the depth of the water
+        // scene.overrideMaterial = depthMaterial;
+
+        // renderer.setRenderTarget(renderTarget);
+        // renderer.render(scene, camera);
+        // renderer.setRenderTarget(null);
+
+        // scene.overrideMaterial = null;
+        // this.water.visible = true;
+        
+        var time = clock.getElapsedTime();
+        this.water.material.uniforms.time.value = time;
+        // this.water.material.uniforms.threshold.value = this.waterUniforms.threshold;
+        this.water.material.uniforms.foamColor.value.set(this.waterUniforms.foamColor);
+        this.water.material.uniforms.waterColor.value.set(this.waterUniforms.waterColor);
+
+        renderer.render(scene, camera);
     }
 
 }

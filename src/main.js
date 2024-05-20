@@ -3,12 +3,11 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GUI } from "dat.gui";
 import { FbxLoader } from "./components/utils/fbxLoader";
 import { MouseControl, MouseSelectedObj } from "./components/utils/mouseControl";
-import { SetColorOnSelected } from "./components/utils/colorSetter";
 import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
 import { PathSpawner } from "./components/path/pathSpawner";
 
-import { Water } from "./components/environment/water";
+import { WaterControl } from "./components/environment/water";
 import { Bird } from "./components/environment/bird";
 import { DropDownMenu } from "./components/ui/button";
 
@@ -51,6 +50,34 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 document.body.appendChild(renderer.domElement);
+
+var supportsDepthTextureExtension = !!renderer.extensions.get(
+  "WEBGL_depth_texture"
+);
+
+var pixelRatio = renderer.getPixelRatio();
+
+var renderTarget = new THREE.WebGLRenderTarget(
+  window.innerWidth * pixelRatio,
+  window.innerHeight * pixelRatio
+);
+renderTarget.texture.minFilter = THREE.NearestFilter;
+renderTarget.texture.magFilter = THREE.NearestFilter;
+renderTarget.texture.generateMipmaps = false;
+renderTarget.stencilBuffer = false;
+
+if (supportsDepthTextureExtension === true) {
+  renderTarget.depthTexture = new THREE.DepthTexture();
+  renderTarget.depthTexture.type = THREE.UnsignedShortType;
+  renderTarget.depthTexture.minFilter = THREE.NearestFilter;
+  renderTarget.depthTexture.maxFilter = THREE.NearestFilter;
+}
+
+
+var depthMaterial = new THREE.MeshDepthMaterial();
+depthMaterial.depthPacking = THREE.RGBADepthPacking;
+depthMaterial.blending = THREE.NoBlending;
+
 // Create Sky
 createSky();
 
@@ -256,28 +283,7 @@ const building = {
 
 
 
-////////////////// WATER SHADER //////////////////////
-
-
-const WaterControl = 
-{
-  mirrorShaderVar: {
-    waveSpeed: 0.03,
-    waveStrength: 0.5,
-    color: "#000000"
-  },
-  waveShaderVar: {
-    uBigWavesElevation: .60,
-    uBigWavesFrequency: new THREE.Vector2(.2, .2),
-    uBigWavesSpeed: 0.75,
-    uDepthColor: '#889999',
-    uSurfaceColor: '#9bd8ff',
-    uColorOffset: 0.08,
-    uColorMultiplier: .1 ,
-  }
-}
-
-const water = new Water(WaterControl.mirrorShaderVar, WaterControl. waveShaderVar);
+const water = new WaterControl(scene, camera, renderer, renderTarget, pixelRatio);
 
 const GridControl = 
 {
@@ -388,10 +394,13 @@ var methods = {
     if (MouseSelectedObj != null && MouseSelectedObj.name == "grass") {
       let position = MouseSelectedObj.position;
 
-      pathSpawner.SpawnSingleWater(scene, water, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
+      pathSpawner.SpawnSingleWater(scene, camera, renderTarget, pixelRatio, supportsDepthTextureExtension, water, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
 
       grid.gridArr[position.x / GridControl.cellSize][position.z / GridControl.cellSize].DisablePlacing();
+
+      
     }
+    
   }
 };
 
@@ -570,17 +579,26 @@ function addHouseLight(PosX, PosY, PosZ){
 }
 
 //this fucntion is called when the window is resized
-var MyResize = function () {
-  var width = window.innerWidth;
-  var height = window.innerHeight;
-  renderer.setSize(width, height);
-  camera.aspect = width / height;
+var onWindowResize = function () {
+  camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.render(scene, camera);
+
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  var pixelRatio = renderer.getPixelRatio();
+
+  renderTarget.setSize(
+    window.innerWidth * pixelRatio,
+    window.innerHeight * pixelRatio
+  );
+  water.material.uniforms.resolution.value.set(
+    window.innerWidth * pixelRatio,
+    window.innerHeight * pixelRatio
+  );
 };
 
 //link the resize of the window to the update of the camera
-window.addEventListener('resize', MyResize);
+window.addEventListener('resize', onWindowResize, false);
 
 // MOUSE CONTROL
 
@@ -630,7 +648,7 @@ function animate() {
     fireflies.material.uniforms.time.value += deltaTime;
       
     if (BirdControl.isMoving) bird.Update(BirdControl.flySpeed, BirdControl.animationSpeed);
-    water.Update(clock);
+    water.animate(scene, camera, renderer, renderTarget, clock, depthMaterial);
     
     renderer.render(scene, camera);
     requestAnimationFrame(animate);

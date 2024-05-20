@@ -2,7 +2,6 @@ import * as THREE from 'three';
 import { PathNode } from '../pathfinding/pathNode';
 import { FbxLoader } from '../utils/fbxLoader';
 import { Plane } from '../utils/primitiveMesh';
-import { Water } from '../environment/water';
 
 export class PathSpawnPoint 
 {
@@ -88,15 +87,15 @@ export class PathSpawnPoint
         }
     }
 
-    SpawnWater(scene, water, cellSize) : void 
+    SpawnWater(scene, camera, renderTarget, pixelRatio, supportsDepthTextureExtension, water, cellSize) : void 
     {
         if (this.top || this.bottom || this.left || this.right) return; 
         if (!this.CanSpawn()) return;
 
         if (this.spawnObj != null) scene.remove(this.spawnObj);
-        
+
         this.spawnObjName = "Water";
-        this.spawnObj = water.AddWater(scene, this.x * cellSize, 0, this.y * cellSize);
+        this.spawnObj = water.AddWater(scene, camera, renderTarget, pixelRatio, supportsDepthTextureExtension, this.x * cellSize, 0, this.y * cellSize);
 
     }
 
