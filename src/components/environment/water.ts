@@ -4,41 +4,45 @@ import waterFragmentShader from '../../shaders/waterShaderFrag.glsl?raw'
 
 export class WaterControl
 {
-    water = null; 
+    water = null; boxes = [];
     noiseMap; dudvMap;
 
     waterUniforms = {
-        time: {
-            value: 0
-        },
-        threshold: {
-            value: 0.01
-        },
-        tDudv: {
-            value: null
-        },
-        tDepth: {
-            value: null
-        },
-        cameraNear: {
-            value: 0
-        },
-        cameraFar: {
-            value: 0
-        },
-        resolution: {
-            value: new THREE.Vector2()
-        },
-        foamColor: {
-            value: new THREE.Color(0xffffff)
-        },
-        waterColor: {
-            value: new THREE.Color(0x14c6a5)
-        }
+        
     };
 
-    constructor()
+    constructor(WaterParams)
     {
+        this.waterUniforms = {
+            time: {
+                value: 0
+            },
+            threshold: {
+                value: 0.01
+            },
+            tDudv: {
+                value: null
+            },
+            tDepth: {
+                value: null
+            },
+            cameraNear: {
+                value: 0
+            },
+            cameraFar: {
+                value: 0
+            },
+            resolution: {
+                value: new THREE.Vector2()
+            },
+            foamColor: {
+                value: new THREE.Color(WaterParams.foamColor),
+            },
+            waterColor: {
+                value: new THREE.Color(WaterParams.waterColor),
+            }
+        }
+
         var loader = new THREE.TextureLoader();
         this.noiseMap = loader.load("https://i.imgur.com/gPz7iPX.jpg");
         this.dudvMap = loader.load("https://i.imgur.com/hOIsXiZ.png");
@@ -77,6 +81,8 @@ export class WaterControl
         box4.rotation.y = Math.PI * 0.5;
         scene.add(box4);
 
+        this.boxes.push(box1, box2, box3, box4);
+
         var waterGeometry = new THREE.PlaneGeometry(10, 10);
         var waterMaterial = new THREE.ShaderMaterial({
             defines: {
@@ -108,7 +114,7 @@ export class WaterControl
         scene.add(this.water);
     }
 
-    animate(scene, camera, renderer, renderTarget, clock, depthMaterial)
+    animate(scene, camera, renderer, renderTarget, clock, depthMaterial, WaterParams)
     {
         if (this.water == null) return;
 
@@ -123,12 +129,26 @@ export class WaterControl
         // this.water.visible = true;
         
         var time = clock.getElapsedTime();
-        this.water.material.uniforms.time.value = time;
+        this.water.material.uniforms.time.value = time * WaterParams.speed;
         // this.water.material.uniforms.threshold.value = this.waterUniforms.threshold;
-        this.water.material.uniforms.foamColor.value.set(this.waterUniforms.foamColor);
-        this.water.material.uniforms.waterColor.value.set(this.waterUniforms.waterColor);
+        this.water.material.uniforms.foamColor.value.set(new THREE.Color(WaterParams.foamColor));
+        this.water.material.uniforms.waterColor.value.set(new THREE.Color(WaterParams.waterColor));
 
         renderer.render(scene, camera);
     }
 
+    Remove(scene) : void 
+    {
+        if (this.water) {
+            scene.remove(this.water);
+            this.water = null;
+        }
+        if (this.boxes.length > 0) 
+        {
+            this.boxes.forEach((box) => 
+            {
+                scene.remove(box);
+            })
+        }
+    }
 }

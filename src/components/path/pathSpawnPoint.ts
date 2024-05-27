@@ -2,14 +2,16 @@ import * as THREE from 'three';
 import { PathNode } from '../pathfinding/pathNode';
 import { FbxLoader } from '../utils/fbxLoader';
 import { Plane } from '../utils/primitiveMesh';
+import { WaterControl } from '../environment/water';
 
 export class PathSpawnPoint 
 {
     x: number; y : number;
     left: boolean = false; right: boolean = false; 
     top: boolean = false; bottom: boolean = false;
-    building: any;
+    building: any; 
     spawnObj: any; spawnObjName: string;
+    spawnObjList: [];
 
     constructor(x, y, building)
     {
@@ -61,7 +63,7 @@ export class PathSpawnPoint
         if (this.top || this.bottom || this.left || this.right) return; 
         if (!this.CanSpawn()) return;
 
-        if (this.spawnObj != null) scene.remove(this.spawnObj);
+        this.Clear(scene);
         
         this.spawnObjName = "Tree";
         this.spawnObj = await FbxLoader(this.building.tree, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
@@ -70,7 +72,7 @@ export class PathSpawnPoint
     async SpawnHouse(scene, loadingManager, cellSize): Promise<void> 
     {
         if (this.top || this.bottom || this.left || this.right) return; 
-        if (this.spawnObj != null) scene.remove(this.spawnObj);
+        this.Clear(scene);
         
         this.spawnObjName = "House";
         this.spawnObj = await FbxLoader(this.building.houseBlue, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
@@ -80,7 +82,7 @@ export class PathSpawnPoint
     {
         if (this.top || this.bottom || this.left || this.right)
         {
-            if (this.spawnObj != null) scene.remove(this.spawnObj);
+            this.Clear(scene);
 
             this.spawnObjName = "Path";
             this.spawnObj = await FbxLoader(this.building.path, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
@@ -92,16 +94,30 @@ export class PathSpawnPoint
         if (this.top || this.bottom || this.left || this.right) return; 
         if (!this.CanSpawn()) return;
 
-        if (this.spawnObj != null) scene.remove(this.spawnObj);
+        this.Clear(scene);
 
         this.spawnObjName = "Water";
-        this.spawnObj = water.AddWater(scene, camera, renderTarget, pixelRatio, supportsDepthTextureExtension, this.x * cellSize, 0, this.y * cellSize);
-
+        water.AddWater(scene, camera, renderTarget, pixelRatio, supportsDepthTextureExtension, this.x * cellSize, 0, this.y * cellSize);
+        this.spawnObj = water.water;
+        this.spawnObjList = water.boxes;
     }
 
     Clear(scene) : void
     {
-        if (this.spawnObj != null) scene.remove(this.spawnObj);
+        if (this.spawnObj != null) {
+            if (this.spawnObjName === "Water")
+            {
+                this.spawnObjList.forEach((obj) => 
+                {
+                    scene.remove(obj);
+                })
+            }
+            scene.remove(this.spawnObj);
+
+            this.spawnObj = null;
+            this.spawnObjName = "";
+            this.spawnObjList = [];
+        }
     }
 
     ClearWithName(scene, name) : void 

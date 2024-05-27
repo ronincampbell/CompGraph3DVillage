@@ -282,8 +282,14 @@ const building = {
 };
 
 
+const WaterParams = 
+{
+  speed: 1,
+  foamColor: 0xffffff,
+  waterColor: 0x14c6a5
+}
+const water = new WaterControl(WaterParams);
 
-const water = new WaterControl(scene, camera, renderer, renderTarget, pixelRatio);
 
 const GridControl = 
 {
@@ -513,6 +519,9 @@ birdFolder.add(BirdControl, "animationSpeed", 0, 1);
 birdFolder.add(methods, "spawnBird");
 
 const waterFolder = gui.addFolder("Water");
+waterFolder.add(WaterParams, "speed", 0, 5);
+waterFolder.addColor(WaterParams, "foamColor");
+waterFolder.addColor(WaterParams, "waterColor");
 waterFolder.add(methods, "addWater")
 
 // Create control
@@ -648,7 +657,7 @@ function animate() {
     fireflies.material.uniforms.time.value += deltaTime;
       
     if (BirdControl.isMoving) bird.Update(BirdControl.flySpeed, BirdControl.animationSpeed);
-    water.animate(scene, camera, renderer, renderTarget, clock, depthMaterial);
+    water.animate(scene, camera, renderer, renderTarget, clock, depthMaterial, WaterParams);
     
     renderer.render(scene, camera);
     requestAnimationFrame(animate);
