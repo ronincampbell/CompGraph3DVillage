@@ -215,6 +215,17 @@ loadingManager.onLoad = function()
 }
 
 // List object
+const mountain = 
+{
+  name: "mountain",
+  model: "../assets/CustomModels/Mountains.fbx",
+  tex: "../assets/CustomModels/Textures/mountainPallete.png",
+  scale: .5,
+  light: "",
+  offset: new THREE.Vector3(50, -35, 60),
+  shadows: true,
+}
+
 const building = {
   house: {
     name: "house",
@@ -338,6 +349,11 @@ let pathSpawner = null;
 let grid = null;
 
 var methods = {
+  spawnMountain: async function() 
+  {
+    await FbxLoader(mountain, scene, loadingManager, 0, 0, 0);
+  },
+
   spawnGrid: async function() 
   {
     if (pathSpawner != null)
@@ -505,16 +521,18 @@ dayFolder.add(dayCycle, "enable").onChange(() => {
   }
 });
 
+const mountainFolder = gui.addFolder("Mountain");
+mountainFolder.add(methods, "spawnMountain").name("Spawn");
+
 const gridFolder = gui.addFolder("Grid");
-gridFolder.add(GridControl, "cellSize", 10, 100, 10);
 gridFolder.add(GridControl, "width", 1, 20, 1);
 gridFolder.add(GridControl, "length", 1, 20, 1);
-gridFolder.add(methods, "spawnGrid");
+gridFolder.add(methods, "spawnGrid").name("Spawn");
 
 const treeFolder = gui.addFolder("Tree");
 treeFolder.add(TreeControl, "maxNum", 0, 100);
 treeFolder.add(TreeControl, "percent", 0, 1);
-treeFolder.add(methods, "spawnTree");
+treeFolder.add(methods, "spawnTree").name("Spawn");
 
 const houseFolder = gui.addFolder("House");
 houseFolder.add(HouseControl, "type", 0, 3, 1).onChange(async () => 
@@ -547,13 +565,13 @@ birdFolder.add(BirdControl, "isMoving");
 birdFolder.add(BirdControl, "number", 0, 20, 1);
 birdFolder.add(BirdControl, "flySpeed", 0, 1, 0.01);
 birdFolder.add(BirdControl, "animationSpeed", 0, 1);
-birdFolder.add(methods, "spawnBird");
+birdFolder.add(methods, "spawnBird").name("Spawn");
 
 const waterFolder = gui.addFolder("Water");
 waterFolder.add(WaterParams, "speed", 0, 5);
 waterFolder.addColor(WaterParams, "foamColor");
 waterFolder.addColor(WaterParams, "waterColor");
-waterFolder.add(methods, "addWater")
+waterFolder.add(methods, "addWater").name("Spawn");
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
