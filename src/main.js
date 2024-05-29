@@ -567,11 +567,11 @@ birdFolder.add(BirdControl, "flySpeed", 0, 1, 0.01);
 birdFolder.add(BirdControl, "animationSpeed", 0, 1);
 birdFolder.add(methods, "spawnBird").name("Spawn");
 
-const waterFolder = gui.addFolder("Water");
-waterFolder.add(WaterParams, "speed", 0, 5);
-waterFolder.addColor(WaterParams, "foamColor");
-waterFolder.addColor(WaterParams, "waterColor");
-waterFolder.add(methods, "addWater").name("Spawn");
+// const waterFolder = gui.addFolder("Water");
+// waterFolder.add(WaterParams, "speed", 0, 5);
+// waterFolder.addColor(WaterParams, "foamColor");
+// waterFolder.addColor(WaterParams, "waterColor");
+// waterFolder.add(methods, "addWater").name("Spawn");
 
 // Create control
 const controls = new OrbitControls(camera, renderer.domElement);
