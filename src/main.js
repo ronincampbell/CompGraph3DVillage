@@ -279,6 +279,15 @@ const building = {
     offset: new THREE.Vector3(68.35, 0, 0),
     shadows: true,
   },
+  mountains: {
+    name: "mountains",
+    model: "../assets/CustomModels/Mountains.fbx",
+    tex: "../assets/CustomModels/Textures/mountainPallete.png",
+    scale: 1,
+    light: "",
+    offset: new THREE.Vector3(0, 0, 0),
+    shadows: true,
+  },
 };
 
 
