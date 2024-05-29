@@ -78,6 +78,16 @@ export class PathSpawnPoint
         this.spawnObj = await FbxLoader(this.building.houseBlue, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
     }
 
+    async ChangeHouse(scene, loadingManager, house, cellSize): Promise<void> 
+    {
+        if (this.spawnObjName !== "House") return;
+
+        this.Clear(scene);
+
+        this.spawnObjName = "House";
+        this.spawnObj = await FbxLoader(house, scene, loadingManager, this.x * cellSize, 0, this.y * cellSize);
+    }
+
     async SpawnPath(scene, loadingManager, cellSize): Promise<void> 
     {
         if (this.top || this.bottom || this.left || this.right)

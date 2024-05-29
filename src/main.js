@@ -2,7 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import { GUI } from "dat.gui";
 import { FbxLoader } from "./components/utils/fbxLoader";
-import { MouseControl, MouseSelectedObj } from "./components/utils/mouseControl";
+import { MouseControl, MouseSelectedObj, ResetSelectedObject } from "./components/utils/mouseControl";
 import { Grid } from "./components/pathfinding/grid";
 import { PathFinding } from "./components/pathfinding/pathFinding";
 import { PathSpawner } from "./components/path/pathSpawner";
@@ -508,7 +508,29 @@ treeFolder.add(TreeControl, "percent", 0, 1);
 treeFolder.add(methods, "spawnTree");
 
 const houseFolder = gui.addFolder("House");
-houseFolder.add(HouseControl, "type", 0, 3);
+houseFolder.add(HouseControl, "type", 0, 3, 1).onChange(async () => 
+{
+  if (MouseSelectedObj != null && MouseSelectedObj.name == 'house') {
+    let position = MouseSelectedObj.parent.position;
+    ResetSelectedObject();
+
+    switch (HouseControl.type) {
+      case 0:
+        await pathSpawner.ChangeHouse(scene, loadingManager, building.houseBlue, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
+        break;
+      case 1:
+        await pathSpawner.ChangeHouse(scene, loadingManager, building.house, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
+        break;
+      case 2:
+        await pathSpawner.ChangeHouse(scene, loadingManager, building.houseGreen, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
+        break;
+      case 3:
+        await pathSpawner.ChangeHouse(scene, loadingManager, building.houseYellow, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
+        break;
+
+    }
+  }
+});
 houseFolder.add(HouseControl, "number", 0, 10);
 
 const birdFolder = gui.addFolder("Bird");
@@ -546,31 +568,31 @@ controls.enableDamping = true;
     }
 
     if (houseLastType != Math.round(HouseControl.type)) {
-      let position = new THREE.Vector3(0, 0, 0);
-      if (MouseSelectedObj != null && MouseSelectedObj.name == 'house') {
+      // let position = new THREE.Vector3(0, 0, 0);
+      // if (MouseSelectedObj != null && MouseSelectedObj.name == 'house') {
 
-        console.log("placed")
-        position = MouseSelectedObj.parent.position;
-        scene.remove(MouseSelectedObj.parent);
+      //   console.log("placed")
+      //   position = MouseSelectedObj.parent.position;
+      //   scene.remove(MouseSelectedObj.parent);
 
-        switch (houseLastType) {
-          case 0:
-            await FbxLoader(building.house, scene, position.x, position.y, position.z);
-            break;
-          case 1:
-            await FbxLoader(building.houseBlue, scene, position.x, position.y, position.z);
-            break;
-          case 2:
-            await FbxLoader(building.houseYellow, scene, position.x, position.y, position.z);
-            break;
-          case 3:
-            await FbxLoader(building.houseGreen, scene, position.x, position.y, position.z);
-            break;
+      //   switch (houseLastType) {
+      //     case 0:
+      //       pathSpawner.SpawnSingleHouse(scene, loadingManager, position.x / GridControl.cellSize, position.z / GridControl.cellSize);
+      //       break;
+      //     case 1:
+      //       await FbxLoader(building.houseBlue, scene, position.x, position.y, position.z);
+      //       break;
+      //     case 2:
+      //       await FbxLoader(building.houseYellow, scene, position.x, position.y, position.z);
+      //       break;
+      //     case 3:
+      //       await FbxLoader(building.houseGreen, scene, position.x, position.y, position.z);
+      //       break;
 
-        }
-      }
+      //   }
+      // }
 
-      houseLastType = Math.round(HouseControl.type);
+      // houseLastType = Math.round(HouseControl.type);
 
     }
 

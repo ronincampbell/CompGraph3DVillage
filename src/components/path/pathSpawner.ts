@@ -119,6 +119,11 @@ export class PathSpawner
         await this.pathSpawnPoints[i][j].SpawnHouse(scene, loadingManager, this.cellSize);
     }
 
+    async ChangeHouse(scene, loadingManager, house, i, j) : Promise<void> 
+    {
+        await this.pathSpawnPoints[i][j].ChangeHouse(scene, loadingManager, house, this.cellSize);
+    }
+
     SpawnSingleWater(scene, camera, renderTarget, pixelRatio, supportsDepthTextureExtension, water, i, j) : void 
     {
         this.pathSpawnPoints[i][j].SpawnWater(scene, camera, renderTarget, pixelRatio, supportsDepthTextureExtension, water, this.cellSize);

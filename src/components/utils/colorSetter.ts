@@ -3,6 +3,12 @@ import * as THREE from 'three'
 let selectedObj = null;
 let lastColor = null;
 
+export function Reset()
+{
+    selectedObj = null;
+    lastColor = null;
+}
+
 export function SetColorOnSelected(obj, color) {
 
     if (selectedObj != null)

@@ -1,8 +1,15 @@
 import * as THREE from 'three'
-import {SetColorOnSelected} from './colorSetter.ts'
+import {SetColorOnSelected, Reset} from './colorSetter.ts'
 
 export var MouseSelectedObj = null;
 var lastColor = [];
+
+export function ResetSelectedObject()
+{
+    MouseSelectedObj = null;
+    lastColor = [];
+    Reset();
+}
 
 export function MouseControl(document, renderer, camera, scene) {
     var raycaster = new THREE.Raycaster();
