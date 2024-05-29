@@ -1,5 +1,6 @@
 import * as THREE from 'three'
 import { FBXLoader } from "three/examples/jsm/loaders/FBXLoader"
+import { TextureLoader } from './textureLoader';
 
 export async function FbxLoader(building, scene, loadingManager, positionx, positiony, positionz, animatedObjects = null)
 {
@@ -44,3 +45,4 @@ export async function FbxLoader(building, scene, loadingManager, positionx, posi
     
     return object;
 }
+

@@ -218,11 +218,11 @@ loadingManager.onLoad = function()
 const mountain = 
 {
   name: "mountain",
-  model: "../assets/CustomModels/Mountains.fbx",
+  model: "../assets/CustomModels/MountainsNew.fbx",
   tex: "../assets/CustomModels/Textures/mountainPallete.png",
   scale: .5,
   light: "",
-  offset: new THREE.Vector3(50, -35, 60),
+  offset: new THREE.Vector3(50, -35, 70),
   shadows: true,
 }
 
@@ -646,10 +646,6 @@ var onWindowResize = function () {
   var pixelRatio = renderer.getPixelRatio();
 
   renderTarget.setSize(
-    window.innerWidth * pixelRatio,
-    window.innerHeight * pixelRatio
-  );
-  water.material.uniforms.resolution.value.set(
     window.innerWidth * pixelRatio,
     window.innerHeight * pixelRatio
   );
